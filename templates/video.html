@@ -1,0 +1,125 @@
+<html>
+<head>
+        <title>Video Page</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/css/bootstrap.min.css" rel="stylesheet"
+        integrity="sha384-GLhlTQ8iRABdZLl6O3oVMWSktQOp6b7In1Zl3/Jr59b6EGGoI1aFkw7cmDA6j6gD" crossorigin="anonymous">
+</head>
+<body class="m-0">
+        <div class="container mt-5 mb-3">
+                <div class="row">
+                    <h1>{{ video_title }}</h1>
+                    <p class="lead">
+                        <strong>Professor {{ profname }}'s Video</strong>
+                        <br />
+                    </p>
+                    <div class="ratio ratio-16x9">
+                        <iframe id="video-ifr" src="{{url}}">
+                        </iframe>
+                    </div>
+                    <h1>WebSocket Chat</h1>
+                    <button class="btn btn-primary align-self-start" onClick="showForm(event)" id="connect">Connect</button>
+                    <form class="" action="" onsubmit="sendMessage(event)" id="form" style="display: none">
+                        <div class="mt-1 column">
+                            <input type="text" class="form-control" id="messageText" autocomplete="off"/>
+                            <!--
+                            <input type="text" class="form-control" id="timestamp1" autocomplete="off"/>
+                            <input type="text" class="form-control" id="timestamp2" autocomplete="off"/>
+                            -->
+                            <button type="submit" class="mt-2 btn btn-primary">Send</button>
+                        </div>
+                    </form>
+                    <ul id='messages' class="list-group mt-2">
+                        <!--
+                        <li class="list-group-item">
+                            <span class="text-muted mr-1">2:12</span>
+                            <span>My question</span>
+                        </li>
+                        <li class="list-group-item">
+                            <span class="text-muted mr-1">2:19</span>
+                            <span>My question</span>
+                        </li>
+                    -->
+                    </ul>
+                </div>
+            </div>
+        <script>
+            var tag = document.createElement("script")
+            tag.id = "iframe-demo"
+            tag.src = "https://www.youtube.com/iframe_api"
+            var firstScriptTag = document.getElementsByTagName("script")[0]
+            firstScriptTag.parentNode.insertBefore(tag, firstScriptTag)
+
+            var player;
+            function onYouTubeIframeAPIReady() {
+                player = new YT.Player("video-ifr", {
+                    events: {
+                        "onReady": (ev) => player = ev.target,
+                    }
+                })
+            }
+
+            var clientID = Date.now();
+            var ws = new WebSocket(`ws://localhost:8000/ws/${clientID}`);
+            ws.onmessage = processMessage;
+
+            function formatTimestamp(timestamp) {
+                let hours = 0;
+                let minutes = 0;
+                let seconds = timestamp;
+                while (seconds >= 60) {
+                    seconds -= 60;
+                    minutes++;
+                }
+                while (minutes >= 60) {
+                    minutes -= 60;
+                    hours++;
+                }
+                return `${hours > 0 ? hours.toString() + ":" : ""}${minutes}:${seconds.toString().padStart(2, "0")}`;
+            }
+
+            function addMessage(timestamp, message) {
+                var messageEl = document.createElement("li")
+                messageEl.classList.add("list-group-item")
+                var timestampEl = document.createElement("span")
+                timestampEl.classList.add("text-muted", "mr-1")
+                timestampEl.textContent = formatTimestamp(timestamp)
+                var messageRealEl = document.createElement("span")
+                messageRealEl.textContent = message
+                messageEl.appendChild(timestampEl)
+                messageEl.appendChild(document.createTextNode(" "))
+                messageEl.appendChild(messageRealEl)
+                var messages = document.querySelector("#messages")
+                messages.appendChild(messageEl)
+            }
+
+            function processMessage(event) {
+                console.log(event);
+                let d = JSON.parse(event.data);
+                addMessage(d.timestamp, d.message);
+            }
+
+
+            function sendMessage(event) {
+                var input = document.getElementById("messageText")
+                var message = input.value
+                var timestamp = Math.round(player.getCurrentTime())
+                //addMessage(timestamp, message)
+                ws.send(JSON.stringify({ timestamp, message }));
+
+                input.value = ''
+                event.preventDefault()
+            }
+            
+            function showForm(event) {
+                var button = document.getElementById("connect");
+                var form = document.getElementById("form");
+                button.style.display = "none";
+                form.style.display = "block";
+            }
+
+        </script>
+        <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/js/bootstrap.bundle.min.js"
+        integrity="sha384-w76AqPfDkMBDXo30jS1Sgez6pr3x5MlQ1ZAGC+nuZB+EYdgRZgiwxhTBTkF7CXvN"
+        crossorigin="anonymous"></script>
+</body>
+</html>
