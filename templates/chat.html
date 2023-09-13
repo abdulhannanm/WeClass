@@ -1,51 +1,89 @@
-
 <!DOCTYPE html>
-<html>
-    <head>
-        <title>Chat</title>
-    </head>
-    <body>
-        <h1>WebSocket Chat</h1>
-        <button onClick="showForm(event)" id="connect">Connect</button>
-        <form action="" onsubmit="sendMessage(event)" id="form" style="display: none">
-            <input type="text" id="messageText" autocomplete="off"/>
-            <button>Send</button>
-        </form>
-        <ul id='messages'>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>WebSocket Chat</title>
+    <!-- Include any necessary stylesheets or scripts here -->
+</head>
+<body>
+    <h1>WebSocket Chat</h1>
+    
+    <div id="messages-container">
+        <ul id="messages" class="list-group">
+            <!-- Messages will be added dynamically here -->
         </ul>
-        <script>
-            var clientID = Date.now();
-            var ws = new WebSocket(`ws://localhost:8000/ws/${clientID}`);
+    </div>
+    
+    <div id="form" style="display: none;">
+        <form id="messageForm">
+            <input type="text" id="messageText" placeholder="Type your message...">
+            <button type="submit">Send</button>
+        </form>
+    </div>
+    
+    <script>
+        const clientID = Date.now();
+        const ws = new WebSocket(`ws://localhost:8000/ws/${clientID}`);
 
-            function processMessage(event) {
-                var messages = document.getElementById('messages')
-                var message = document.createElement('li')
-                var content = document.createTextNode(event.data)
-                message.appendChild(content);
-                messages.appendChild(message);
+        ws.onmessage = processMessage;
+
+        function formatTimestamp(timestamp) {
+            let hours = 0;
+            let minutes = 0;
+            let seconds = timestamp;
+            while (seconds >= 60) {
+                seconds -= 60;
+                minutes++;
             }
-
-            ws.onmessage = processMessage;
-
-            function sendMessage(event) {
-                var input = document.getElementById("messageText")
-                var message = document.createElement('li')
-                var content = document.createTextNode(input.value)
-                message.appendChild(content);
-                messages.appendChild(message);
-                ws.send(input.value);
-
-                input.value = ''
-                event.preventDefault()
+            while (minutes >= 60) {
+                minutes -= 60;
+                hours++;
             }
-            
-            function showForm(event) {
-                var button = document.getElementById("connect");
-                var form = document.getElementById("form");
-                button.style.display = "none";
-                form.style.display = "block";
-            }
+            return `${hours > 0 ? hours.toString() + ":" : ""}${minutes}:${seconds.toString().padStart(2, "0")}`;
+        }
 
-        </script>
-    </body>
+        function addMessage(timestamp, message) {
+            var messageEl = document.createElement("li");
+            messageEl.classList.add("list-group-item");
+            var timestampEl = document.createElement("span");
+            timestampEl.classList.add("text-muted", "mr-1");
+            timestampEl.textContent = formatTimestamp(timestamp);
+            var messageRealEl = document.createElement("span");
+            messageRealEl.textContent = message;
+            messageEl.appendChild(timestampEl);
+            messageEl.appendChild(document.createTextNode(" "));
+            messageEl.appendChild(messageRealEl);
+            var messages = document.querySelector("#messages");
+            messages.appendChild(messageEl);
+        }
+
+        function processMessage(event) {
+            let d = JSON.parse(event.data);
+            addMessage(d.timestamp, d.message);
+        }
+
+        function sendMessage(event) {
+            event.preventDefault();
+            var input = document.getElementById("messageText");
+            var message = input.value;
+            var timestamp = Math.round(player.getCurrentTime());
+            ws.send(JSON.stringify({ timestamp, message }));
+            input.value = "";
+        }
+
+        function showForm(event) {
+            var button = document.getElementById("connect");
+            var form = document.getElementById("form");
+            button.style.display = "none";
+            form.style.display = "block";
+        }
+
+    </script>
+</body>
 </html>
+
+
+
+
+

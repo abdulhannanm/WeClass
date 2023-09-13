@@ -1,5 +1,6 @@
 from typing import Union, List
 from fastapi import FastAPI, Request, Form, File, UploadFile, WebSocket, WebSocketDisconnect, Response
+from fastapi import *
 from fastapi.responses import HTMLResponse, RedirectResponse
 from fastapi.staticfiles import StaticFiles
 from fastapi.templating import Jinja2Templates
@@ -38,14 +39,6 @@ def create_db():
         room_id TEXT
     )
     """)
-    cursor.execute("""
-        CREATE TABLE IF NOT EXISTS messages (
-            id INT AUTO_INCREMENT PRIMARY KEY,
-            message TEXT,
-            video_timestamp INT,
-            timestamp TIMESTAMP DEFAULT CURRENT_TIMESTAMP
-        )
-    """)
 
 create_db()
 
@@ -59,9 +52,16 @@ class ConnectionManager:
         await websocket.accept()
         self.connections.append(websocket)
 
+    async def disconnect(self, websocket:WebSocket):
+        self.connections.remove(websocket)
+
+
     async def broadcast(self, data: str):
         for connection in self.connections:
-            await connection.send_text(data)
+            try:
+                await connection.send_text(data)
+            except WebSocketDisconnect:
+                self.connections.remove(connection)
 
 
 manager = ConnectionManager()
@@ -79,17 +79,35 @@ def add_room_id():
         query2 = "INSERT INTO vid_ids (room_id) VALUES(%s)"
         values = (res, )
         cursor.execute(query2, values)
+        create_table_query = f"""
+        CREATE TABLE IF NOT EXISTS {res} (
+            id INT AUTO_INCREMENT PRIMARY KEY,
+            message TEXT,
+            video_timestamp INT,
+            timestamp TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+        )
+        """
+        cursor.execute(create_table_query)
         connection.commit()
     return res
 
 
-@app.websocket("/ws/{client_id}")
-async def websocket_endpoint(websocket: WebSocket, client_id: int):
+def get_messages_for_room(room_id):
+    query = f'SELECT * FROM {room_id}'
+    cursor.execute(query)
+    results = cursor.fetchall()
+    return results
+
+@app.websocket("/ws/{client_id}/{room_id}")
+async def websocket_endpoint(websocket: WebSocket, client_id: int, room_id: int):
     await manager.connect(websocket)
-    while True:
-        data = await websocket.receive_text()
-        print(data)
-        await manager.broadcast(f"{data}")
+    try:
+        while True:
+            data = await websocket.receive_text()
+            print(data)
+            await manager.broadcast(data)
+    except WebSocketDisconnect:
+        await manager.disconnect(web)
 
 
 
@@ -124,8 +142,14 @@ async def handle_form(video_title: str = Form(...), url: str = Form(...), profna
 @app.get("/video/{profname}/{video_title}/{new_url}/{room_id}", response_class=HTMLResponse)
 async def read_item(request: Request, profname: str, video_title: str, new_url: str, room_id: str):
     video_url = "https://www.youtube.com/embed/" + new_url + "?enablejsapi=1"
-    print(video_url)
-    return templates.TemplateResponse("video.html", {"request": request, "video_title": video_title, "profname": profname, "url": video_url})
+    messages = get_messages_for_room(room_id)
+    print(messages)
+    return templates.TemplateResponse("video.html", 
+    {"request": request, 
+    "video_title": video_title, 
+    "profname": profname, 
+    "url": video_url, 
+    "messages":messages})
     
 
 

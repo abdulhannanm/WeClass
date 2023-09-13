@@ -16,6 +16,7 @@
                         <iframe id="video-ifr" src="{{url}}">
                         </iframe>
                     </div>
+                    <!-- <button id="closeButton">Click to Close</button> -->
                     <h1>WebSocket Chat</h1>
                     <button class="btn btn-primary align-self-start" onClick="showForm(event)" id="connect">Connect</button>
                     <form class="" action="" onsubmit="sendMessage(event)" id="form" style="display: none">
@@ -43,6 +44,24 @@
                 </div>
             </div>
         <script>
+            // var messagesFromDB = {{ messages|tojson|safe }};
+            // console.log("Messages from database:", messagesFromDatabase);
+            // var closeButton = document.getElementById("closeButton");
+            // closeButton.addEventListener("click", function() {
+            //     ws.send(JSON.stringify({ close: true}));
+            // });
+            // const storedClientId = localStorage.getItem("clientID")
+            // const storedClientId = localStorage.getItem("clientID")
+            // const clientID = storedClientID || Date.now()
+            // localStorage.setItem("clientID", clientID)
+            // const ws = new WebSocket(`ws://localhost:8000/ws/${clientID}`)
+            
+            // const clientID = storedClientID || Date.now()
+            // localStorage.setItem("clientID", clientID)
+            // const ws = new WebSocket(`ws://localhost:8000/ws/${clientID}`)
+            // window.onload = () => {
+            //     const storedClientId = localStorage.getItem("clientID")
+            // }
             var tag = document.createElement("script")
             tag.id = "iframe-demo"
             tag.src = "https://www.youtube.com/iframe_api"
@@ -100,6 +119,7 @@
 
 
             function sendMessage(event) {
+                event.preventDefault()
                 var input = document.getElementById("messageText")
                 var message = input.value
                 var timestamp = Math.round(player.getCurrentTime())
@@ -107,7 +127,6 @@
                 ws.send(JSON.stringify({ timestamp, message }));
 
                 input.value = ''
-                event.preventDefault()
             }
             
             function showForm(event) {
