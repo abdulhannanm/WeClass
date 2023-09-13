@@ -17,8 +17,8 @@
                         </iframe>
                     </div>
                     <!-- <button id="closeButton">Click to Close</button> -->
-                    <h1>WebSocket Chat</h1>
-                    <button class="btn btn-primary align-self-start" onClick="showForm(event)" id="connect">Connect</button>
+                    <h1 id=room-id style="color: white;">{{room_id}}</h1>
+                    <button class="btn btn-primary align-self-start" onClick="showForm(event, '{{room_id}}')" id="connect">Connect</button>
                     <form class="" action="" onsubmit="sendMessage(event)" id="form" style="display: none">
                         <div class="mt-1 column">
                             <input type="text" class="form-control" id="messageText" autocomplete="off"/>
@@ -78,8 +78,7 @@
             }
 
             var clientID = Date.now();
-            var ws = new WebSocket(`ws://localhost:8000/ws/${clientID}`);
-            ws.onmessage = processMessage;
+            let ws;
 
             function formatTimestamp(timestamp) {
                 let hours = 0;
@@ -96,14 +95,23 @@
                 return `${hours > 0 ? hours.toString() + ":" : ""}${minutes}:${seconds.toString().padStart(2, "0")}`;
             }
 
-            function addMessage(timestamp, message) {
+            function addMessage(timestamp, message, clientID) {
+                console.log("at addMessage")
                 var messageEl = document.createElement("li")
                 messageEl.classList.add("list-group-item")
+                
+                var clientEl = document.createElement("div")
+                clientEl.classList.add('text-muted', 'mb-1')
+                clientEl.textContent = clientID
+
                 var timestampEl = document.createElement("span")
                 timestampEl.classList.add("text-muted", "mr-1")
                 timestampEl.textContent = formatTimestamp(timestamp)
+
                 var messageRealEl = document.createElement("span")
                 messageRealEl.textContent = message
+
+                messageEl.appendChild(clientEl)
                 messageEl.appendChild(timestampEl)
                 messageEl.appendChild(document.createTextNode(" "))
                 messageEl.appendChild(messageRealEl)
@@ -112,9 +120,11 @@
             }
 
             function processMessage(event) {
+                console.log("got here")
                 console.log(event);
                 let d = JSON.parse(event.data);
-                addMessage(d.timestamp, d.message);
+                console.log(d.timestamp, d.message, d.clientID)
+                addMessage(d.timestamp, d.message, d.clientID);
             }
 
 
@@ -124,16 +134,32 @@
                 var message = input.value
                 var timestamp = Math.round(player.getCurrentTime())
                 //addMessage(timestamp, message)
-                ws.send(JSON.stringify({ timestamp, message }));
+                console.log(clientID, message, timestamp)
+                ws.send(JSON.stringify({ timestamp: timestamp, message: message, clientID: clientID }));
 
                 input.value = ''
             }
             
-            function showForm(event) {
+            function showForm(event, roomID) {
                 var button = document.getElementById("connect");
                 var form = document.getElementById("form");
                 button.style.display = "none";
                 form.style.display = "block";
+                event.preventDefault()
+                if (ws) {
+                    ws.onmessage = processMessage
+                }
+                else{
+                    const wsURL = `ws://localhost:8000/ws/${roomID}/${clientID}`;
+                    ws = new WebSocket(wsURL)
+
+                    ws.onopen = () => {
+                        ws.onmessage = processMessage;
+                    }
+                    ws.onerror = () => {
+                        console.error(error)
+                    }
+                }
             }
 
         </script>

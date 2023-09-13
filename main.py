@@ -44,27 +44,18 @@ create_db()
 
 
 
-class ConnectionManager:
-    def __init__(self):
-        self.connections: List[WebSocket] = []
+class Room:
+    def __init__(self, room_id):
+        self.room_id = room_id
+        self.connections = []
 
-    async def connect(self, websocket: WebSocket):
-        await websocket.accept()
-        self.connections.append(websocket)
-
-    async def disconnect(self, websocket:WebSocket):
-        self.connections.remove(websocket)
-
-
-    async def broadcast(self, data: str):
-        for connection in self.connections:
-            try:
-                await connection.send_text(data)
-            except WebSocketDisconnect:
-                self.connections.remove(connection)
+    async def broadcast(self, message, sender):
+        for connection in set(self.connections):
+            print(message)
+            await connection.send_text(message)
 
 
-manager = ConnectionManager()
+room_dict = {}
 
 def add_room_id():
     nor_res = ''.join(random.choices(string.ascii_lowercase + string.digits, k=5))
@@ -98,16 +89,38 @@ def get_messages_for_room(room_id):
     results = cursor.fetchall()
     return results
 
-@app.websocket("/ws/{client_id}/{room_id}")
-async def websocket_endpoint(websocket: WebSocket, client_id: int, room_id: int):
-    await manager.connect(websocket)
+@app.websocket("/ws/{room_id}/{client_id}")
+async def websocket_endpoint(websocket: WebSocket, client_id: str, room_id: str):
     try:
+        await websocket.accept()
+        if room_id not in room_dict:
+            room_dict[room_id] = Room(room_id)
+        room = room_dict[room_id]
+        room.connections.append(websocket)
+
+        print(f"connection established for {client_id} in room {room_id}")
+
         while True:
             data = await websocket.receive_text()
-            print(data)
-            await manager.broadcast(data)
+            await room.broadcast(data, websocket)
     except WebSocketDisconnect:
-        await manager.disconnect(web)
+        if room_id not in room_dict:
+            room = room_dict[room_id]
+            room.connections.remove(websocket)
+            if len(room.connections) == 0:
+                del room_dict[room_id]
+
+@app.on_event("shutdown")
+async def shutdown_event():
+    for room_id in room_dict:
+        room = room_dict[room_id]
+        for connection in room.connections:
+            try:
+                await connection.close()
+            except Exception as e:
+                print(f"error during closing: {e}")
+    ngrok.disconnect(8000)
+    ngrok.kill()
 
 
 
@@ -149,7 +162,8 @@ async def read_item(request: Request, profname: str, video_title: str, new_url: 
     "video_title": video_title, 
     "profname": profname, 
     "url": video_url, 
-    "messages":messages})
+    "messages":messages,
+    "room_id": room_id})
     
 
 
