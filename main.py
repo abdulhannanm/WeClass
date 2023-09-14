@@ -45,12 +45,18 @@ create_db()
 
 
 class Room:
-    def __init__(self, room_id):
-        self.room_id = room_id
-        self.connections = []
+    def __init__(self):
+        self.connections = {}
+
+    def add_connection(self, client_id, websocket):
+        self.connections[client_id] = websocket
+    
+    def remove_connection(self, client_id):
+        if client_id in self.connections:
+            del self.connections[client_id]
 
     async def broadcast(self, message, sender):
-        for connection in set(self.connections):
+        for client_id, connection in self.connections.items():
             print(message)
             await connection.send_text(message)
 
@@ -82,6 +88,8 @@ def add_room_id():
         connection.commit()
     return res
 
+            
+
 
 def get_messages_for_room(room_id):
     query = f'SELECT * FROM {room_id}'
@@ -91,12 +99,13 @@ def get_messages_for_room(room_id):
 
 @app.websocket("/ws/{room_id}/{client_id}")
 async def websocket_endpoint(websocket: WebSocket, client_id: str, room_id: str):
+
     try:
         await websocket.accept()
         if room_id not in room_dict:
-            room_dict[room_id] = Room(room_id)
+            room_dict[room_id] = Room()
         room = room_dict[room_id]
-        room.connections.append(websocket)
+        room.add_connection(client_id, websocket)
 
         print(f"connection established for {client_id} in room {room_id}")
 
@@ -104,11 +113,11 @@ async def websocket_endpoint(websocket: WebSocket, client_id: str, room_id: str)
             data = await websocket.receive_text()
             await room.broadcast(data, websocket)
     except WebSocketDisconnect:
-        if room_id not in room_dict:
+        print("reset has happened")
+        if room_id in room_dict:
             room = room_dict[room_id]
-            room.connections.remove(websocket)
-            if len(room.connections) == 0:
-                del room_dict[room_id]
+            room.remove_connection(client_id)
+
 
 @app.on_event("shutdown")
 async def shutdown_event():
@@ -119,8 +128,7 @@ async def shutdown_event():
                 await connection.close()
             except Exception as e:
                 print(f"error during closing: {e}")
-    ngrok.disconnect(8000)
-    ngrok.kill()
+
 
 
 
@@ -151,6 +159,7 @@ async def handle_form(video_title: str = Form(...), url: str = Form(...), profna
     print(profname)
     room_id = add_room_id()
     return '/video/'+profname+"/"+video_title+"/"+new_url+'/'+room_id
+
 
 @app.get("/video/{profname}/{video_title}/{new_url}/{room_id}", response_class=HTMLResponse)
 async def read_item(request: Request, profname: str, video_title: str, new_url: str, room_id: str):
