@@ -18,8 +18,7 @@
 </head>
 <body class="m-0">
         <nav class="navbar navbar-expand-lg navbar-light bg-light" style="background-color:#fff !important; text-decoration: none;">
-                <a class="navbar-brand" href="/" style="color:#B84E91;">WeClass</a>
-              </nav>
+                <a class="navbar-brand" href="/" style="color:#B84E91;">WeClass</a>              </nav>
         <div class="container mt-5 mb-3">
                 <div class="row">
                     <h1>{{ video_title }}</h1>
@@ -34,15 +33,18 @@
                     <!-- <button id="closeButton">Click to Close</button> -->
                     <!-- <h1 id=room-id style="color: white;">{{room_id}}</h1> -->
                     <div style="margin-block: 20px; "></div>
-                    <button class="btn btn-primary btn-lg active" onClick="showForm(event, '{{room_id}}')" id="connect" style="background-color: #fff; color: #B84E91; border-radius: 15px;">Connect</button>
+                    <button class="btn btn-primary btn-lg active" onClick="showForm(event, '{{room_id}}')" id="connect" style="background-color: #fff; color: #B84E91; border-radius: 10px;">Connect</button>
                     <form class="" action="" onsubmit="sendMessage(event)" id="form" style="display: none">
                         <div class="mt-1 column">
                             <input type="text" class="form-control" id="messageText" autocomplete="off" required style="border-radius: 10px;">
-                            <input type="hidden" id="replyTo" value=""> 
-                            <button type="submit" class="mt-2 btn btn-primary" style="color:#B84E91; background-color:white;">=></button>
+                            <!--
+                            <input type="text" class="form-control" id="timestamp1" autocomplete="off"/>
+                            <input type="text" class="form-control" id="timestamp2" autocomplete="off"/>
+                            -->
+                            <button type="submit" class="mt-2 btn btn-primary" style="color:#B84E91; background-color:white;">Send</button>
                         </div>
                     </form>
-                    <ul id='messages' class="list-group mt-2">
+                    <ul id='messages' class="list-group mt-2" style="border-radius: 20px;">
                         <!--
                         <li class="list-group-item">
                             <span class="text-muted mr-1">2:12</span>
@@ -90,7 +92,21 @@
                 })
             }
 
-            var clientID = Date.now();
+            function promptForName() {
+                let userName = localStorage.getItem("userName");
+                if (!userName) {
+                    userName = prompt("Name or Press Enter To Stay Anonymous:") || Date.now();
+                    localStorage.setItem("userName", userName);
+                }
+                return userName;
+            }
+
+
+        // Get the user's name
+            const userName = promptForName();
+            console.log(userName)
+
+            var clientID = userName;
             let ws;
 
             
@@ -139,41 +155,7 @@
                 console.log(event);
                 let d = JSON.parse(event.data);
                 console.log(d.timestamp, d.message, d.clientID)
-                if (d.replyTo) {
-                    addReply(d.timestamp, d.message, d.clientID, d.replyTo);
-                } else {
-                    addMessage(d.timestamp, d.message, d.clientID);
-                }
-            }
-
-            function addReply(timestamp, message, clientID, replyTo) {
-                console.log("at addReply")
-                var messageEl = document.createElement("li")
-                messageEl.classList.add("list-group-item", "reply") // Add a "reply" class for styling
-                
-                var clientEl = document.createElement("div")
-                clientEl.classList.add('text-muted', 'mb-1')
-                clientEl.textContent = clientID
-
-                var timestampEl = document.createElement("span")
-                timestampEl.classList.add("text-muted", "mr-1")
-                timestampEl.textContent = formatTimestamp(timestamp)
-
-                var messageRealEl = document.createElement("span")
-                messageRealEl.textContent = message
-
-                // Add a "Reply to" indicator
-                var replyIndicator = document.createElement("span")
-                replyIndicator.textContent = "Reply to: " + replyTo
-                replyIndicator.classList.add("text-info", "ml-2") // You can style this indicator as needed
-
-                messageEl.appendChild(clientEl)
-                messageEl.appendChild(timestampEl)
-                messageEl.appendChild(document.createTextNode(" "))
-                messageEl.appendChild(replyIndicator)
-                messageEl.appendChild(messageRealEl)
-                var messages = document.querySelector("#messages")
-                messages.appendChild(messageEl)
+                addMessage(d.timestamp, d.message, d.clientID);
             }
 
 
@@ -182,17 +164,13 @@
                 var input = document.getElementById("messageText")
                 var message = input.value
                 var timestamp = Math.round(player.getCurrentTime())
-                var replyTo = document.getElementById("replyTo").value 
-                console.log(clientID, message, timestamp, replyTo)
-                ws.send(JSON.stringify({ timestamp: timestamp, message: message, clientID: clientID, replyTo: replyTo }));
+                //addMessage(timestamp, message)
+                console.log(clientID, message, timestamp)
+                ws.send(JSON.stringify({ timestamp: timestamp, message: message, clientID: clientID }));
+
                 input.value = ''
-                document.getElementById("replyTo").value = ""
             }
             
-            function replyToMessage(clientID) {
-                document.getElementById("replyTo").value = clientID
-}   
-
             function showForm(event, roomID) {
                 var button = document.getElementById("connect");
                 var form = document.getElementById("form");
