@@ -177,7 +177,7 @@
                     ws.onmessage = processMessage
                 }
                 else{
-                    const wsURL = `ws://localhost:8000/ws/${roomID}/${clientID}`;
+                    const wsURL = `wss://weclass-8df8aec151be.herokuapp.com/ws/${room_id}/${client_id}`;
                     ws = new WebSocket(wsURL)
 
                     ws.onopen = () => {

@@ -106,7 +106,7 @@ def add_room_id():
 
 @app.websocket("/ws/{room_id}/{client_id}")
 async def websocket_endpoint(websocket: WebSocket, client_id: str, room_id: str):
-
+    
     try:
         await websocket.accept()
         if room_id not in room_dict:
