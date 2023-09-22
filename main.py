@@ -1,12 +1,8 @@
-from typing import Union, List
 from fastapi import FastAPI, Request, Form, File, UploadFile, WebSocket, WebSocketDisconnect, Response
 from fastapi import *
 from fastapi.responses import HTMLResponse, RedirectResponse
 from fastapi.staticfiles import StaticFiles
 from fastapi.templating import Jinja2Templates
-from starlette.datastructures import URL
-from pydantic import BaseModel
-import mysql.connector
 import random
 import string
 from fastapi.middleware.cors import CORSMiddleware
@@ -41,15 +37,15 @@ templates = Jinja2Templates(directory="templates")
 
 
 
-def create_db():
-    cursor.execute("CREATE DATABASE IF NOT EXISTS chat_db")
-    cursor.execute("USE chat_db")
-    cursor.execute("""
-    CREATE TABLE IF NOT EXISTS vid_ids (
-        id INT AUTO_INCREMENT PRIMARY KEY,
-        room_id TEXT
-    )
-    """)
+# def create_db():
+#     cursor.execute("CREATE DATABASE IF NOT EXISTS chat_db")
+#     cursor.execute("USE chat_db")
+#     cursor.execute("""
+#     CREATE TABLE IF NOT EXISTS vid_ids (
+#         id INT AUTO_INCREMENT PRIMARY KEY,
+#         room_id TEXT
+#     )
+#     """)
 
 # create_db()
 
