@@ -7,7 +7,7 @@ import random
 import string
 from fastapi.middleware.cors import CORSMiddleware
 import uvicorn
-from python-multipart import *
+from python_multipart import *
 
 app = FastAPI()
 
