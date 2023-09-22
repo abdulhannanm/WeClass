@@ -108,39 +108,15 @@ async def get_analytics_data():
     analytics_data = [
         {
             "roomID": "room1",
-            "clientID": "1000000345453",
-            "timestamp": "2023-09-22 00:00:00",
-            "message": "hi",
+            "clientID": "Jay Rajesh",
+            "timestamp": "2023-09-22 00:01:40",
+            "message": "2",
         },
         {
             "roomID": "room1",
-            "clientID": "client2",
-            "timestamp": "2023-09-22 00:05:00",
-            "message": "what is going on here",
-        },
-                {
-            "roomID": "room1",
-            "clientID": "1000000345453",
-            "timestamp": "2023-09-22 00:00:00",
-            "message": "tbh i dont even know",
-        },
-        {
-            "roomID": "room1",
-            "clientID": "client2",
-            "timestamp": "2023-09-22 00:05:00",
-            "message": "this is the analytics page",
-        },
-                {
-            "roomID": "room1",
-            "clientID": "1000000345453",
-            "timestamp": "2023-09-22 00:00:00",
-            "message": "it is only accessible to teachers",
-        },
-        {
-            "roomID": "room1",
-            "clientID": "client2",
-            "timestamp": "2023-09-22 00:05:00",
-            "message": "only the teachers can see what we write here",
+            "clientID": "AbdulHannan",
+            "timestamp": "2023-09-22 00:00:20",
+            "message": "2",
         }
 
     ]
