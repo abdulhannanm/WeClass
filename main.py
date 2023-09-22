@@ -6,6 +6,7 @@ from fastapi.templating import Jinja2Templates
 import random
 import string
 from fastapi.middleware.cors import CORSMiddleware
+import uvicorn
 
 
 app = FastAPI()
