@@ -141,7 +141,7 @@ async def get_analytics_data():
             "clientID": "client2",
             "timestamp": "2023-09-22 00:05:00",
             "message": "only the teachers can see what we write here",
-        },
+        }
 
     ]
 
