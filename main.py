@@ -1,6 +1,6 @@
 from fastapi import FastAPI, Request, Form, File, UploadFile, WebSocket, WebSocketDisconnect, Response
 from fastapi import *
-from fastapi.responses import HTMLResponse, RedirectResponse
+from fastapi.responses import HTMLResponse, RedirectResponse, JSONResponse
 from fastapi.staticfiles import StaticFiles
 from fastapi.templating import Jinja2Templates
 import random
@@ -102,7 +102,7 @@ def add_room_id():
     #     connection.commit()
     return res
 
-@app.get("/api/analytics")
+@app.get("/api/analytics", response_class=JSONResponse)
 async def get_analytics_data():
 
     analytics_data = [
