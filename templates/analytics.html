@@ -1,0 +1,56 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Analytics Page</title>
+</head>
+<body>
+    <h1>Analytics Page</h1>
+    <table id="analytics-table">
+        <thead>
+            <tr>
+                <th>Room ID</th>
+                <th>Client ID</th>
+                <th>Timestamp</th>
+                <th>Message</th>
+            </tr>
+        </thead>
+        <tbody>
+            <!-- Analytics data will be displayed here -->
+        </tbody>
+    </table>
+    <script>
+        async function fetchAnalyticsData() {
+        // Fetch data from your server or database
+        // Example: const response = await fetch('/api/analytics');
+        // const data = await response.json();
+        // Return the data
+        return data;
+    }
+
+    // Function to populate the table with analytics data
+    async function populateTable() {
+        const tableBody = document.querySelector('#analytics-table tbody');
+        
+        // Fetch analytics data
+        const analyticsData = await fetchAnalyticsData();
+
+        // Loop through the data and create table rows
+        analyticsData.forEach((entry) => {
+            const row = document.createElement('tr');
+            row.innerHTML = `
+                <td>${entry.roomID}</td>
+                <td>${entry.clientID}</td>
+                <td>${entry.timestamp}</td>
+                <td>${entry.message}</td>
+            `;
+            tableBody.appendChild(row);
+        });
+    }
+
+    // Call the populateTable function when the page loads
+    window.addEventListener('load', populateTable);
+    </script>
+</body>
+</html>

@@ -102,7 +102,29 @@ def add_room_id():
     #     connection.commit()
     return res
 
-            
+@app.get("/api/analytics")
+async def get_analytics_data():
+
+    analytics_data = [
+        {
+            "roomID": "room1",
+            "clientID": "client1",
+            "timestamp": "2023-09-22 12:00:00",
+            "message": "Hello from client 1",
+        },
+        {
+            "roomID": "room1",
+            "clientID": "client2",
+            "timestamp": "2023-09-22 12:05:00",
+            "message": "Hi there from client 2",
+        },
+
+    ]
+
+    return JSONResponse(content=analytics_data)            
+
+
+
 
 
 # def get_messages_for_room(room_id):
