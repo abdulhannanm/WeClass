@@ -9,9 +9,17 @@ from pydantic import BaseModel
 import mysql.connector
 import random
 import string
+from fastapi.middleware.cors import CORSMiddleware
 
 
 app = FastAPI()
+
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=["*"],
+    allow_methods=["*"],
+    allow_headers=["*"],
+)
 
 
 app.mount("/static", StaticFiles(directory="static"), name="static")
@@ -28,6 +36,9 @@ templates = Jinja2Templates(directory="templates")
 
 # connection = mysql.connector.connect(**db_config)
 # cursor = connection.cursor()
+
+
+
 
 
 def create_db():
@@ -177,8 +188,19 @@ async def read_item(request: Request, profname: str, video_title: str, new_url: 
     "url": video_url, 
     "messages":messages,
     "room_id": room_id})
+
+@app.on_event("shutdown")
+async def shutdown_event():
+    for room_id in room_dict:
+        room = room_dict[room_id]
+        for connection in room.connections:
+            try:
+                await connection.close()
+            except Exception as e:
+                print(f"error during closing: {e}")
+
     
 
 
 if __name__ == "__main__":
-    uvicorn.run("fastapi_code:app")
+    uvicorn.run("main:app")

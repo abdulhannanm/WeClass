@@ -93,20 +93,16 @@
             }
 
             function promptForName() {
-                let userName = localStorage.getItem("userName");
-                if (!userName) {
-                    userName = prompt("Name or Press Enter To Stay Anonymous:") || Date.now();
-                    localStorage.setItem("userName", userName);
-                }
+                userName = prompt("Name or Press Enter To Stay Anonymous:") || Date.now();
                 return userName;
             }
 
 
-        // Get the user's name
-            const userName = promptForName();
-            console.log(userName)
+        
+            // const userName = promptForName();
+            // console.log(userName)
 
-            var clientID = userName;
+            var clientID = Date.now()
             let ws;
 
             
