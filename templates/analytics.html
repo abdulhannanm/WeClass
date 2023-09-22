@@ -23,9 +23,8 @@
     <script>
         async function fetchAnalyticsData() {
         // Fetch data from your server or database
-        // Example: const response = await fetch('/api/analytics');
-        // const data = await response.json();
-        // Return the data
+        const response = await fetch('/api/analytics')
+        const data = await response.json()
         return data;
     }
 
