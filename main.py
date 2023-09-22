@@ -121,7 +121,11 @@ async def get_analytics_data():
 
     ]
 
-    return JSONResponse(content=analytics_data)            
+    return JSONResponse(content=analytics_data)    
+
+@app.get("/analytics", response_class=HTMLResponse)
+async def get_analytics_page():
+    return FileResponse("analytics.html")        
 
 
 
