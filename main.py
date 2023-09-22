@@ -17,6 +17,13 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
+@app.middleware("http")
+async def add_permissions_policy_header(request: Request, call_next):
+    response: Response = await call_next(request)
+    response.headers["Permissions-Policy"] = "accelerometer=(), camera=(), geolocation=(), gyroscope=(), magnetometer=(), microphone=(), payment=(), usb=()"
+
+    return response
+
 
 app.mount("/static", StaticFiles(directory="static"), name="static")
 
