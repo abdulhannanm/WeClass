@@ -186,7 +186,15 @@ def create(request: Request):
 def profform(request: Request):
     return templates.TemplateResponse("prof.html", {"request": request})
 
+@app.get('/inprog')
+def prog(request: Request):
+    return templates.TemplateResponse('inprog.html', {"request": request})
+    
 
+@app.get('/about')
+def prog(request: Request):
+    return templates.TemplateResponse('about.html', {"request": request})
+    
 
 
 @app.post("/submitform", response_class=RedirectResponse, status_code=302)
