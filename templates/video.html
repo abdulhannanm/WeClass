@@ -92,8 +92,9 @@
                 })
             }
 
-            function promptForName() {
-                userName = prompt("Name or Press Enter To Stay Anonymous:") || Date.now();
+            window.onload = function() {
+                const userName = prompt("Name or Press Enter To Stay Anonymous:") || Date.now();
+                localStorage.setItem("name", JSON.stringify(userName))
                 return userName;
             }
 
@@ -122,7 +123,7 @@
                 return `${hours > 0 ? hours.toString() + ":" : ""}${minutes}:${seconds.toString().padStart(2, "0")}`;
             }
 
-            function addMessage(timestamp, message, clientID) {
+            function addMessage(timestamp, message, clientID, nameOfUser) {
                 console.log("at addMessage")
                 var messageEl = document.createElement("li")
                 messageEl.classList.add("list-group-item")
