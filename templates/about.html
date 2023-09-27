@@ -9,28 +9,35 @@
     <noscript><link rel="stylesheet" href="{{ url_for('static', path='noscript.css') }}" /></noscript>
     <link rel="icon" href="{{url_for('static', path='images/weclassr.png')}}" type="image/icon type">
     <style>
+        .contact-icons a {
+            text-decoration: none;
+            border: none;
+            outline: none;
+        }
+
         .pink-section {
             background-color: #B84E91;
             padding: 20px;
         }
-        
+    
         .pink-section h1 {
             color: white;
             font-size: 30px;
         }
     
         .pink-section p {
-            color: black;
+            color: white;
         }
     
         .about-me-box {
-            background-color: white;
+            background: linear-gradient(135deg, #B84E91, #776bcc);
             padding: 20px;
             box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
             overflow: hidden;
             border-radius: 10px;
             display: flex;
             flex-wrap: wrap;
+            position: relative;
         }
     
         .about-me-image {
@@ -46,8 +53,23 @@
     
         .about-me-content {
             flex: 2;
+            color: white;
         }
-    </style>
+    
+        .contact-icons {
+            position: absolute;
+            bottom: 10px;
+            right: 10px;
+            display: flex;
+            align-items: center;
+        }
+    
+        .contact-icons img {
+            width: 24px;
+            height: 24px;
+            margin-right: 10px;
+        }
+    </style>    
 </head>
 <body class="is-preload">
     <nav class="navbar navbar-expand-lg navbar-light bg-light" style="background-color:#fff !important; text-decoration: none;">
@@ -68,22 +90,30 @@
                 <h2>Jay Rajesh</h2>
                 <p>Lorem ipsum dolor sit amet, consectetur adipiscing elit. Nullam eget condimentum tortor. Integer eget ultrices turpis. Sed nec malesuada leo, nec aliquam risus. Suspendisse non tristique nunc, id congue libero. Nulla facilisi.</p>
                 <p>Proin et libero vel nunc sollicitudin bibendum. Sed dapibus vestibulum mi, id feugiat justo. Suspendisse potenti. Vestibulum ullamcorper, ipsum eu dignissim suscipit, odio ligula bibendum nisi, in semper felis elit vel urna.</p>
+
+                <div class="contact-icons">
+                    <a href="https://www.linkedin.com/in/jay-rajesh-a7628419a/" target="_blank"><img src="static/images/linkedin-logo.png" alt="LinkedIn"></a>
+                    <a href="mailto:jay@example.com"><img src="static/images/gmail-logo.png" alt="Email" style="margin-top: 5px;"></a>
+                </div>
             </div>
         </div>
 
-        <!-- Additional White Rectangle Box 1 -->
         <div class="about-me-box" style="margin-top: 20px;">
             <div class="about-me-image">
-                <img src="static/images/rayyan_about_me.png" alt="RayyanHussain">
+                <img src="static/images/rayyan_about_me2.png" alt="RayyanHussain">
             </div>
             <div class="about-me-content">
                 <h2>Rayyan Hussain</h2>
                 <p>Lorem ipsum dolor sit amet, consectetur adipiscing elit. Nullam eget condimentum tortor. Integer eget ultrices turpis. Sed nec malesuada leo, nec aliquam risus. Suspendisse non tristique nunc, id congue libero. Nulla facilisi.</p>
                 <p>Proin et libero vel nunc sollicitudin bibendum. Sed dapibus vestibulum mi, id feugiat justo. Suspendisse potenti. Vestibulum ullamcorper, ipsum eu dignissim suscipit, odio ligula bibendum nisi, in semper felis elit vel urna.</p>
+
+                <div class="contact-icons">
+                    <a href="https://www.linkedin.com/in/rayyan-h/" target="_blank"><img src="static/images/linkedin-logo.png" alt="LinkedIn"></a>
+                    <a href="mailto:rayyan@example.com"><img src="static/images/gmail-logo.png" alt="Email" style="margin-top: 5px;"></a>
+                </div>
             </div>
         </div>
 
-        <!-- Additional White Rectangle Box 2 -->
         <div class="about-me-box" style="margin-top: 20px;">
             <div class="about-me-image">
                 <img src="sample_image_2.jpg" alt="abdulhannan">
@@ -92,6 +122,11 @@
                 <h2>Abdulhannan Mohammad</h2>
                 <p>Lorem ipsum dolor sit amet, consectetur adipiscing elit. Nullam eget condimentum tortor. Integer eget ultrices turpis. Sed nec malesuada leo, nec aliquam risus. Suspendisse non tristique nunc, id congue libero. Nulla facilisi.</p>
                 <p>Proin et libero vel nunc sollicitudin bibendum. Sed dapibus vestibulum mi, id feugiat justo. Suspendisse potenti. Vestibulum ullamcorper, ipsum eu dignissim suscipit, odio ligula bibendum nisi, in semper felis elit vel urna.</p>
+
+                <div class="contact-icons">
+                    <a href="https://www.linkedin.com/in/abdulhannan" target="_blank"><img src="static/images/linkedin-logo.png" alt="LinkedIn"></a>
+                    <a href="mailto:abdulhannan@example.com"><img src="static/images/gmail-logo.png" alt="Email" style="margin-top: 5px;"></a>
+                </div>
             </div>
         </div>
     </div>
