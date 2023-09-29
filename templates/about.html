@@ -36,30 +36,29 @@
             overflow: hidden;
             border-radius: 10px;
             display: flex;
-            flex-wrap: wrap;
-            position: relative;
+            flex-direction: column;
+            align-items: center;
+            text-align: center;
+            margin: 10px;
         }
     
         .about-me-image {
-            flex: 1;
-            max-width: 20%;
-            margin-right: 20px;
+            max-width: 100%;
         }
     
         .about-me-image img {
-            max-width: 100%;
+            width: 100%;
             height: auto;
+            max-height: 100%;
+            object-fit: cover;
         }
     
         .about-me-content {
-            flex: 2;
             color: #B84D91;
         }
     
         .contact-icons {
-            position: absolute;
-            bottom: 10px;
-            right: 10px;
+            margin-top: 10px;
             display: flex;
             align-items: center;
         }
@@ -68,6 +67,12 @@
             width: 24px;
             height: 24px;
             margin-right: 10px;
+        }
+
+        .about-me-box-container {
+            display: flex;
+            justify-content: space-between;
+            margin-top: 20px;
         }
     </style>    
 </head>
@@ -82,50 +87,52 @@
     <div class="pink-section">
         <h1>About Us</h1>
 
-        <div class="about-me-box">
-            <div class="about-me-image">
-                <img src="static/images/jay_about_me.jpeg" alt="JayRajesh">
-            </div>
-            <div class="about-me-content">
-                <h2>Jay Rajesh</h2>
-                <p>Lorem ipsum dolor sit amet, consectetur adipiscing elit. Nullam eget condimentum tortor. Integer eget ultrices turpis. Sed nec malesuada leo, nec aliquam risus. Suspendisse non tristique nunc, id congue libero. Nulla facilisi.</p>
-                <p>Proin et libero vel nunc sollicitudin bibendum. Sed dapibus vestibulum mi, id feugiat justo. Suspendisse potenti. Vestibulum ullamcorper, ipsum eu dignissim suscipit, odio ligula bibendum nisi, in semper felis elit vel urna.</p>
+        <div class="about-me-box-container">
+            <div class="about-me-box">
+                <div class="about-me-image">
+                    <img src="static/images/jay_about_me.jpeg" alt="JayRajesh">
+                </div>
+                <div class="about-me-content">
+                    <h2>Jay Rajesh</h2>
+                    <p>Lorem ipsum dolor sit amet, consectetur adipiscing elit. Nullam eget condimentum tortor. Integer eget ultrices turpis. Sed nec malesuada leo, nec aliquam risus. Suspendisse non tristique nunc, id congue libero. Nulla facilisi.</p>
+                    <p>Proin et libero vel nunc sollicitudin bibendum. Sed dapibus vestibulum mi, id feugiat justo. Suspendisse potenti. Vestibulum ullamcorper, ipsum eu dignissim suscipit, odio ligula bibendum nisi, in semper felis elit vel urna.</p>
 
-                <div class="contact-icons">
-                    <a href="https://www.linkedin.com/in/jay-rajesh-a7628419a/" target="_blank"><img src="static/images/linkedin-logo.png" alt="LinkedIn"></a>
-                    <a href="mailto:jay@example.com"><img src="static/images/gmail-logo.png" alt="Email" style="margin-top: 5px;"></a>
+                    <div class="contact-icons">
+                        <a href="https://www.linkedin.com/in/jay-rajesh-a7628419a/" target="_blank"><img src="static/images/linkedin-logo.png" alt="LinkedIn"></a>
+                        <a href="mailto:jay@example.com"><img src="static/images/gmail-logo.png" alt="Email" style="margin-top: 5px;"></a>
+                    </div>
                 </div>
             </div>
-        </div>
 
-        <div class="about-me-box" style="margin-top: 20px;">
-            <div class="about-me-image">
-                <img src="static/images/rayyan_about_me.png" alt="RayyanHussain">
-            </div>
-            <div class="about-me-content">
-                <h2>Rayyan Hussain</h2>
-                <p>Lorem ipsum dolor sit amet, consectetur adipiscing elit. Nullam eget condimentum tortor. Integer eget ultrices turpis. Sed nec malesuada leo, nec aliquam risus. Suspendisse non tristique nunc, id congue libero. Nulla facilisi.</p>
-                <p>Proin et libero vel nunc sollicitudin bibendum. Sed dapibus vestibulum mi, id feugiat justo. Suspendisse potenti. Vestibulum ullamcorper, ipsum eu dignissim suscipit, odio ligula bibendum nisi, in semper felis elit vel urna.</p>
+            <div class="about-me-box">
+                <div class="about-me-image">
+                    <img src="static/images/rayyan_about_me.png" alt="RayyanHussain">
+                </div>
+                <div class="about-me-content">
+                    <h2>Rayyan Hussain</h2>
+                    <p>Lorem ipsum dolor sit amet, consectetur adipiscing elit. Nullam eget condimentum tortor. Integer eget ultrices turpis. Sed nec malesuada leo, nec aliquam risus. Suspendisse non tristique nunc, id congue libero. Nulla facilisi.</p>
+                    <p>Proin et libero vel nunc sollicitudin bibendum. Sed dapibus vestibulum mi, id feugiat justo. Suspendisse potenti. Vestibulum ullamcorper, ipsum eu dignissim suscipit, odio ligula bibendum nisi, in semper felis elit vel urna.</p>
 
-                <div class="contact-icons">
-                    <a href="https://www.linkedin.com/in/rayyan-h/" target="_blank"><img src="static/images/linkedin-logo.png" alt="LinkedIn"></a>
-                    <a href="mailto:rayyan@example.com"><img src="static/images/gmail-logo.png" alt="Email" style="margin-top: 5px;"></a>
+                    <div class="contact-icons">
+                        <a href="https://www.linkedin.com/in/rayyan-h/" target="_blank"><img src="static/images/linkedin-logo.png" alt="LinkedIn"></a>
+                        <a href="mailto:rayyan@example.com"><img src="static/images/gmail-logo.png" alt="Email" style="margin-top: 5px;"></a>
+                    </div>
                 </div>
             </div>
-        </div>
 
-        <div class="about-me-box" style="margin-top: 20px;">
-            <div class="about-me-image">
-                <img src="sample_image_2.jpg" alt="abdulhannan">
-            </div>
-            <div class="about-me-content">
-                <h2>Abdulhannan Mohammad</h2>
-                <p>Lorem ipsum dolor sit amet, consectetur adipiscing elit. Nullam eget condimentum tortor. Integer eget ultrices turpis. Sed nec malesuada leo, nec aliquam risus. Suspendisse non tristique nunc, id congue libero. Nulla facilisi.</p>
-                <p>Proin et libero vel nunc sollicitudin bibendum. Sed dapibus vestibulum mi, id feugiat justo. Suspendisse potenti. Vestibulum ullamcorper, ipsum eu dignissim suscipit, odio ligula bibendum nisi, in semper felis elit vel urna.</p>
+            <div class="about-me-box">
+                <div class="about-me-image">
+                    <img src="sample_image_2.jpg" alt="abdulhannan">
+                </div>
+                <div class="about-me-content">
+                    <h2>Abdulhannan Mohammad</h2>
+                    <p>Lorem ipsum dolor sit amet, consectetur adipiscing elit. Nullam eget condimentum tortor. Integer eget ultrices turpis. Sed nec malesuada leo, nec aliquam risus. Suspendisse non tristique nunc, id congue libero. Nulla facilisi.</p>
+                    <p>Proin et libero vel nunc sollicitudin bibendum. Sed dapibus vestibulum mi, id feugiat justo. Suspendisse potenti. Vestibulum ullamcorper, ipsum eu dignissim suscipit, odio ligula bibendum nisi, in semper felis elit vel urna.</p>
 
-                <div class="contact-icons">
-                    <a href="https://www.linkedin.com/in/abdulhannan" target="_blank"><img src="static/images/linkedin-logo.png" alt="LinkedIn"></a>
-                    <a href="mailto:abdulhannan@example.com"><img src="static/images/gmail-logo.png" alt="Email" style="margin-top: 5px;"></a>
+                    <div class="contact-icons">
+                        <a href="https://www.linkedin.com/in/abdulhannan" target="_blank"><img src="static/images/linkedin-logo.png" alt="LinkedIn"></a>
+                        <a href="mailto:abdulhannan@example.com"><img src="static/images/gmail-logo.png" alt="Email" style="margin-top: 5px;"></a>
+                    </div>
                 </div>
             </div>
         </div>
