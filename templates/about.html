@@ -1,1 +1,161 @@
-About PAGE
+<!DOCTYPE HTML>
+<html>
+<head>
+    <title>WeClass</title>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1, user-scalable=no" />
+    <link rel="stylesheet" href="{{ url_for('static', path='main.css') }}" />
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@4.0.0/dist/css/bootstrap.min.css" integrity="sha384-Gn5384xqQ1aoWXA+058RXPxPg6fy4IWvTNh0E263XmFcJlSAwiGgFAW/dAiS6JXm" crossorigin="anonymous">
+    <noscript><link rel="stylesheet" href="{{ url_for('static', path='noscript.css') }}" /></noscript>
+    <link rel="icon" href="{{url_for('static', path='images/weclass-logo2.png')}}" type="image/icon type" >
+    <style>
+        .contact-icons a {
+            text-decoration: none;
+            border: none;
+            outline: none;
+        }
+
+        .pink-section {
+            background-color: #B84E91;
+            padding: 20px;
+        }
+    
+        .pink-section h1 {
+            color: white;
+            font-size: 30px;
+        }
+    
+        .pink-section p {
+            color: #B84D91;
+        }
+    
+        .about-me-box {
+            background: white;
+            padding: 20px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+            overflow: hidden;
+            border-radius: 10px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            text-align: center;
+            margin: 10px;
+        }
+    
+        .about-me-image {
+            max-width: 100%;
+        }
+    
+        .about-me-image img {
+            width: 300px;
+            height: 300px;
+            object-fit: cover;
+        }
+    
+        .about-me-content {
+            color: #B84D91;
+        }
+    
+        .contact-icons {
+            margin-top: 10px;
+            display: flex;
+            align-items: center;
+        }
+    
+        .contact-icons img {
+            width: 24px;
+            height: 24px;
+            margin-right: 10px;
+        }
+
+        .about-me-box-container {
+            display: flex;
+            justify-content: space-between;
+            margin-top: 20px;
+        }
+    </style>    
+</head>
+<body class="is-preload">
+    <nav class="navbar navbar-expand-lg navbar-light bg-light" style="background-color:#fff !important; text-decoration: none;">
+        <a class="navbar-brand" href="/" style="color:#B84E91;">WeClass</a>
+        <a class="navbar-brand" href="/inprog" style="color:#000000;">Create</a>
+        <a class="navbar-brand" href="/about" style="color:#000000;">About Us</a>
+    </nav>
+
+    <!-- Middle -->
+    <div class="pink-section">
+        <h1>About Us</h1>
+
+        <div class="about-me-box-container">
+            <div class="about-me-box">
+                <div class="about-me-image">
+                    <img src="static/images/jay_about_me.jpeg" alt="JayRajesh">
+                </div>
+                <div class="about-me-content">
+                    <h2>Jay Rajesh</h2>
+                    <!-- <p>Lorem ipsum dolor sit amet, consectetur adipiscing elit. Nullam eget condimentum tortor. Integer eget ultrices turpis. Sed nec malesuada leo, nec aliquam risus. Suspendisse non tristique nunc, id congue libero. Nulla facilisi.</p> -->
+                    <!--<p>Proin et libero vel nunc sollicitudin bibendum. Sed dapibus vestibulum mi, id feugiat justo. Suspendisse potenti. Vestibulum ullamcorper, ipsum eu dignissim suscipit, odio ligula bibendum nisi, in semper felis elit vel urna.</p>  -->
+
+                    <div class="contact-icons">
+                        <a href="https://www.linkedin.com/in/jay-rajesh-a7628419a/" target="_blank"><img src="static/images/linkedin-logo.png" alt="LinkedIn"></a>
+                        <a href="mailto:jay@example.com"><img src="static/images/gmail-logo.png" alt="Email" style="margin-top: 5px;"></a>
+                    </div>
+                </div>
+            </div>
+
+            <div class="about-me-box">
+                <div class="about-me-image">
+                    <img src="static/images/rayyan_about_me.png" alt="RayyanHussain">
+                </div>
+                <div class="about-me-content">
+                    <h2>Rayyan Hussain</h2>
+                    <!--<p>Lorem ipsum dolor sit amet, consectetur adipiscing elit. Nullam eget condimentum tortor. Integer eget ultrices turpis. Sed nec malesuada leo, nec aliquam risus. Suspendisse non tristique nunc, id congue libero. Nulla facilisi.</p> -->
+                    <!-- <p>Proin et libero vel nunc sollicitudin bibendum. Sed dapibus vestibulum mi, id feugiat justo. Suspendisse potenti. Vestibulum ullamcorper, ipsum eu dignissim suscipit, odio ligula bibendum nisi, in semper felis elit vel urna.</p> -->
+
+                    <div class="contact-icons">
+                        <a href="https://www.linkedin.com/in/rayyan-h/" target="_blank"><img src="static/images/linkedin-logo.png" alt="LinkedIn"></a>
+                        <a href="mailto:rayyan@example.com"><img src="static/images/gmail-logo.png" alt="Email" style="margin-top: 5px;"></a>
+                    </div>
+                </div>
+            </div>
+
+            <div class="about-me-box">
+                <div class="about-me-image">
+                    <img src="static/images/abdul_about_me2.png" alt="abdulhannan">
+                </div>
+                <div class="about-me-content">
+                    <h2>Abdulhannan Mohammad</h2>
+                    <!-- <p>Lorem ipsum dolor sit amet, consectetur adipiscing elit. Nullam eget condimentum tortor. Integer eget ultrices turpis. Sed nec malesuada leo, nec aliquam risus. Suspendisse non tristique nunc, id congue libero. Nulla facilisi.</p> -->
+                    <!-- <p>Proin et libero vel nunc sollicitudin bibendum. Sed dapibus vestibulum mi, id feugiat justo. Suspendisse potenti. Vestibulum ullamcorper, ipsum eu dignissim suscipit, odio ligula bibendum nisi, in semper felis elit vel urna.</p> -->
+
+                    <div class="contact-icons">
+                        <a href="https://www.linkedin.com/in/abdulhannan" target="_blank"><img src="static/images/linkedin-logo.png" alt="LinkedIn"></a>
+                        <a href="mailto:abdulhannan@example.com"><img src="static/images/gmail-logo.png" alt="Email" style="margin-top: 5px;"></a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Footer -->
+    <footer id="footer" class="wrapper style1-alt">
+        <div class="inner">
+            <ul class="menu">
+                <li>&copy; WeClass. All rights reserved.</li>
+            </ul>
+        </div>
+    </footer>
+
+    <!-- Scripts -->
+    <script src="static/assets/js/jquery.min.js"></script>
+    <script src="static/assets/js/jquery.scrollex.min.js"></script>
+    <script src="static/assets/js/jquery.scrolly.min.js"></script>
+    <script src="static/assets/js/browser.min.js"></script>
+    <script src="static/assets/js/breakpoints.min.js"></script>
+    <script src="static/assets/js/util.js"></script>
+    <script src="static/assets/js/main.js"></script>
+    <script src="https://code.jquery.com/jquery-3.2.1.slim.min.js" integrity="sha384-KJ3o2DKtIkvYIK3UENzmM7KCkRr/rE9/Qpg6aAZGJwFDMVNA/GpGFF93hXpG5KkN" crossorigin="anonymous"></script>
+    <script src="https://cdn.jsdelivr.net/npm/popper.js@1.12.9/dist/umd/popper.min.js" integrity="sha384-ApNbgh9B+Y1QKtv3Rn7W3mgPxhU9K/ScQsAP7hUibX39j7fakFPskvXusvfa0b4Q" crossorigin="anonymous"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@4.0.0/dist/js/bootstrap.min.js" integrity="sha384-JZR6Spejh4U02d8jOt6vLEHfe/JQGiRRSQQxSfFWpi1MquVdAyjUar5+76PVCmYl" crossorigin="anonymous"></script>
+</body>
+</html>
