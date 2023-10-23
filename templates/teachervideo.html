@@ -1,12 +1,10 @@
 <html>
 <head>
-        <title>Video Page</title>
+        <title>Teacher Video Page</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/css/bootstrap.min.css" rel="stylesheet"
         integrity="sha384-GLhlTQ8iRABdZLl6O3oVMWSktQOp6b7In1Zl3/Jr59b6EGGoI1aFkw7cmDA6j6gD" crossorigin="anonymous">
         <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@4.0.0/dist/css/bootstrap.min.css" integrity="sha384-Gn5384xqQ1aoWXA+058RXPxPg6fy4IWvTNh0E263XmFcJlSAwiGgFAW/dAiS6JXm" crossorigin="anonymous">
-        <link rel="icon" href="{{url_for('static', path='images/weclassr.png')}}" type="image/icon type" >
-        <script>
-        </script>
+		<link rel="icon" href="{{url_for('static', path='images/weclassr.png')}}" type="image/icon type" >
     <style>
         body{
             background: linear-gradient(90deg, #B84E91, #776bcc);
@@ -101,22 +99,30 @@
     }   
 
     </style>
+</head>
 <body class="m-0">
         <nav class="navbar navbar-expand-lg navbar-light bg-light" style="background-color:#fff !important; text-decoration: none;">
             <a class="navbar-brand" href="/" style="color:#B84E91;">WeClass</a>
         </nav>
+        <!-- <div id="myModal" class="modal">
+            <div class="modal-content">
+                <h1 style="text-align:center;">Which Are You</h1>
+                <button class="modal-button" id="teacherBtn">Teacher</button>
+                <button class="modal-button" id='studentBtn'>Student</button>
+            </div>
+        </div>
         <div id="secModal" class="modal">
             <div class="modal-content">
                 <h1 style="text-align:center;">Name</h1>
                 <input type="text" id="nameInput">
                 <button type="submit" id="submitButton" class="modal-button">Submit</button>
             </div>
-        </div>            
+        </div>             -->
         <div class="container mt-5 mb-3">
                 <div class="row">
                     <h1>{{ video_title }}</h1>
                     <p class="lead">
-                        <strong>Professor {{ profname }}</strong>
+                        <strong >Professor {{ profname }}</strong>
                         <br />
                     </p>
                     <div class="ratio ratio-16x9">
@@ -124,7 +130,7 @@
                         </iframe>
                     </div>
                     <div id="roomID" style="display: none;">{{ room_id }}</div>
-
+                    <div id="profName" style="display: none;">Professor {{ profname }}</div>
                     <div style="margin-block: 20px; "></div>
                 <button class="btn btn-primary btn-lg active" onClick="showForm(event, '{{room_id}}')" id="connect" style="background-color: #fff; color: #B84E91; border-radius: 10px;">Connect</button>
                 <div class="sticky-container">
@@ -136,66 +142,92 @@
                     </form>
                 </div>
                 <ul id='messages' class="list-group mt-2" style="border-radius: 20px;">
-                {% for msg in stored_messages %}
-                    {% if '/@' in msg[3] %}
-                        <!-- Nested structure for replies -->
-                        <li class="list-group-item">
-                        <ul class="list-group" style="margin-bottom:5px;">
+                    {% for msg in stored_messages %}
+                        {% if '/@' in msg[3] %}
+                            <!-- Nested structure for replies -->
                             <li class="list-group-item">
-                                <span style="color: black;">{{ msg[0] }}: {{ msg[3][8:] }}</span>
-                            </li>
-                        </ul>
-                    </li>
-                    {% else %}
-                        <li class="list-group-item">
-                            <div class="text-muted mb-1" id='idOrName'>{{ msg[0] }}</div>
-                            <span class="text-muted mr-1 clickTimestamp" data-timestamp="{{ msg[2] }}">{{ formatTimestamp(msg[2]) }}</span>
-                            <span style="color: black;">{{ msg[3] }}</span>
-                            <button class="btn btn-primary btn-sm float-right reply-button" data-msgid="{{ msg[4] }}">Reply</button>
+                            <ul class="list-group" style="margin-bottom:5px;">
+                                <li class="list-group-item">
+                                    <span style="color: black;">{{ msg[1] }}: {{ msg[3][8:] }}</span>
+                                </li>
+                            </ul>
                         </li>
-                    {% endif %}
-                {% endfor %}
-                </ul>
+                        {% else %}
+                            <li class="list-group-item">
+                                <div class="text-muted mb-1" id='idOrName'>{{ msg[1] }}</div>
+                                <span class="text-muted mr-1 clickTimestamp" data-timestamp="{{ msg[2] }}">{{ formatTimestamp(msg[2]) }}</span>
+                                <span style="color: black;">{{ msg[3] }}</span>
+                                <button class="btn btn-primary btn-sm float-right reply-button" data-msgid="{{ msg[4] }}">Reply</button>
+                            </li>
+                        {% endif %}
+                    {% endfor %}
+                    </ul>
                 </div>
             </div>
         <script>
-            function generateShortUIUD() {
-                let result = ''
-                const chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789'
-                for (let i = 0; i < 6; i++){
-                    const randomIndex = Math.floor(Math.random() * chars.length);
-                    result += chars.charAt(randomIndex)
-                }
-                return result
-            }
-            document.addEventListener('DOMContentLoaded', function () {
-                var secModal = document.getElementById('secModal')
-                var nameInput = document.getElementById('nameInput')
-                var submit = document.getElementById('submitButton')
-                // // Open the modal when the page loads
-                if (localStorage.getItem('clientName') === null){
-                    console.log('here')
-                    secModal.style.display = 'block';
-                }
+
+            // document.addEventListener('DOMContentLoaded', function () {
+            //     var modal = document.getElementById('myModal');
+            //     var closeBtn = document.getElementById('closeModalBtn');
+            //     var tchBtn = document.getElementById('teacherBtn')
+            //     var stdBtn = document.getElementById('studentBtn')
+            //     var secModal = document.getElementById('secModal')
+            //     var nameInput = document.getElementById('nameInput')
+            //     var submit = document.getElementById('submitButton')
+            //     // // Open the modal when the page loads
+            //     if (localStorage.getItem('clientRole') === null){
+            //         console.log('here')
+            //         modal.style.display = 'block';
+            //     }
 
                 
-                submit.addEventListener('click', function() {
-                var inputValue = nameInput.value
-                localStorage.setItem("clientName", inputValue)
-                localStorage.setItem('clientID', generateShortUIUD())
-                console.log(localStorage.getItem('clientName'))
-                secModal.style.display = 'none';
-                })
-                nameInput.addEventListener('keydown', function (event) {
-                if (event.key === 'Enter') {
-                    event.preventDefault(); // Prevent the default form submission
-                    submitButton.click(); // Trigger the click event on the submit button
-                }
-             });
-            });
+            //     tchBtn.addEventListener('click', function () {
+            //     localStorage.setItem('clientRole', 'teacher')
+            //     console.log(localStorage.getItem('clientRole'))
+            //     modal.style.display = 'none';
+            //     if (localStorage.getItem('clientName') === null ){
+            //         secModal.style.display = 'block'
+            //     }
+            //     })
+            //     stdBtn.addEventListener('click', function() {
+            //     localStorage.setItem("clientRole", 'student')
+            //     console.log(localStorage.getItem('clientRole'))
+            //     modal.style.display = 'none';
+            //     if (localStorage.getItem('clientName') === null ){
+            //         secModal.style.display = 'block'
+            //     }
+            // })
 
+
+            //     submit.addEventListener('click', function() {
+            //     var inputValue = nameInput.value
+            //     localStorage.setItem("clientName", inputValue)
+            //     console.log(localStorage.getItem('clientName'))
+            //     secModal.style.display = 'none';
+            //     })
+            //     nameInput.addEventListener('keydown', function (event) {
+            //     if (event.key === 'Enter') {
+            //         event.preventDefault(); // Prevent the default form submission
+            //         submitButton.click(); // Trigger the click event on the submit button
+            //     }
+            //  });
+            // });
             
             
+            if (localStorage.getItem("teacherPermission") == null) {
+                var currentUrl = window.location.href;
+                var indexOfTeacher = currentUrl.indexOf('/teacher');
+
+                    if (indexOfTeacher !== -1) {
+                        var newUrl = currentUrl.substring(0, indexOfTeacher);
+                        console.log(newUrl);
+                        // Uncomment the following line if you want to redirect
+                        window.location.href = newUrl;
+                    } else {
+                        console.log("'/teacher' not found in the URL");
+                    }
+                }
+
 
             var tag = document.createElement("script")
             tag.id = "iframe-demo"
@@ -213,20 +245,30 @@
             }
 
 
+            function generateShortUIUD() {
+                let result = ''
+                const chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789'
+                for (let i = 0; i < 6; i++){
+                    const randomIndex = Math.floor(Math.random() * chars.length);
+                    result += chars.charAt(randomIndex)
+                }
+                return result
+            }
+
             let ws;
+            var clientID = document.getElementById('profName').textContent.trim()
             var roomID = document.getElementById('roomID').textContent.trim()
-            showForm(roomID, localStorage.getItem('clientID'))
+            showForm(clientID, roomID)
 
 
             document.querySelectorAll('.reply-button').forEach(function(replyButton) {
-            replyButton.addEventListener('click', function() {
-            var msgID = this.getAttribute('data-msgid');
-            console.log("Reply button clicked for message with msgID:", msgID);
-            var input = document.getElementById('messageText')
-            input.value = "/@"+msgID
+                replyButton.addEventListener('click', function() {
+                var msgID = this.getAttribute('data-msgid');
+                console.log("Reply button clicked for message with msgID:", msgID);
+                var input = document.getElementById('messageText')
+                input.value = "/@"+msgID
                 });
-             });
-
+            });
             document.querySelectorAll('.clickTimestamp').forEach(function(timestamp){
                 timestamp.addEventListener('click', function(){
                     var clickedTimestamp = this.getAttribute("data-timestamp")
@@ -237,7 +279,6 @@
                     }
                 })
             })
-            
 
             function formatTimestamp(timestamp) {
                 let hours = 0;
@@ -254,14 +295,14 @@
                 return `${hours > 0 ? hours.toString() + ":" : ""}${minutes}:${seconds.toString().padStart(2, "0")}`;
             }
 
-            function addMessage(timestamp, message, clientID, msgID) {
+            function addMessage(timestamp, message, clientID, nameOfUser, msgID) {
                 console.log("at addMessage")
                 var messageEl = document.createElement("li")
                 messageEl.classList.add("list-group-item")
                 
                 var clientEl = document.createElement("div")
                 clientEl.classList.add('text-muted', 'mb-1')
-                clientEl.textContent = clientID
+                clientEl.textContent = nameOfUser
                 // if (clientID == localStorage.getItem('clientID')){
                 //     clientEl.textContent = "You"
                 // }
@@ -278,8 +319,6 @@
                     player.seekTo(timestamp, true);
                     player.playVideo();
                 })
-
-
 
                 var messageRealEl = document.createElement("span")
                 messageRealEl.textContent = message
@@ -307,8 +346,7 @@
                 messages.appendChild(messageEl)
             }
 
-
-            function addReply(timestamp, message, clientID, msgID){
+            function addReply(timestamp, message, clientID, nameOfUser, msgID){
                 console.log("at addReply")
                 messageID = message.slice(2, 8)
                 var messageEl = document.createElement("li")
@@ -320,7 +358,6 @@
                 var timestampEl = document.createElement("span")
                 timestampEl.classList.add("text-muted", "mr-1")
                 timestampEl.textContent = formatTimestamp(timestamp)
-                timestampEl.setAttribute("data-timestamp", timestamp)
 
                 var messageRealEl = document.createElement("span")
                 messageRealEl.textContent = message
@@ -368,15 +405,15 @@
             }
 
             function processMessage(event) {
-                console.log("at processMessage")
+                console.log("got here")
                 console.log(event);
                 let d = JSON.parse(event.data);
-                console.log(d.timestamp, d.message, d.clientID, d.msgID)
+                console.log(d.timestamp, d.message, d.clientID)
                 if (d.message.includes("/@")){
-                    addReply(d.timestamp, d.message, d.clientID, d.msgID)
+                    addReply(d.timestamp, d.message, d.clientID, d.clientName, d.msgID)
                 }
                 else{
-                addMessage(d.timestamp, d.message, d.clientID, d.msgID);
+                addMessage(d.timestamp, d.message, d.clientID, d.clientName,d.msgID);
             }
             }
 
@@ -384,28 +421,25 @@
 
             function sendMessage(event) {
                 event.preventDefault()
-                console.log("at sendMessage")
                 var roomID = document.getElementById('roomID').textContent.trim();
                 console.log(roomID)
                 var input = document.getElementById("messageText")
                 var message = input.value
                 var timestamp = Math.round(player.getCurrentTime())
-                var clientName = localStorage.getItem('clientName')
-                var clientID = localStorage.getItem('clientID')
+                var clientName = clientID
                 var msgID = generateShortUIUD()
-                console.log(clientName, clientID, message, timestamp, msgID)
-                ws.send(JSON.stringify({ msgID:msgID, clientName: clientName, roomID: roomID, timestamp: timestamp, message: message, clientID: clientID }));
+                console.log(clientName, clientID, message, timestamp)
+                ws.send(JSON.stringify({msgID:msgID ,clientName: clientName, roomID: roomID, timestamp: timestamp, message: message, clientID: clientID }));
 
                 input.value = ''
             }
             
-            function showForm(roomID, clientID) {
+            function showForm(clientID, roomID) {
                 console.log(roomID)
                 var button = document.getElementById("connect");
                 var form = document.getElementById("form");
                 button.style.display = "none";
                 form.style.display = "block";
-                // event.preventDefault()
                 if (ws) {
                     ws.onmessage = processMessage
                 }
