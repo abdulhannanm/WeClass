@@ -444,7 +444,7 @@
                     ws.onmessage = processMessage
                 }
                 else{
-                    const wsURL = `ws://localhost:8000/ws/${roomID}/${clientID}`;
+                    const wsURL = `wss://weclass.us/ws/${roomID}/${clientID}`;
                     ws = new WebSocket(wsURL)
 
                     ws.onopen = () => {
