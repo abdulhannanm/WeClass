@@ -149,7 +149,7 @@
                     {% else %}
                         <li class="list-group-item">
                             <div class="text-muted mb-1" id='idOrName'>{{ msg[0] }}</div>
-                            <span class="text-muted mr-1">{{ formatTimestamp(msg[2]) }}</span>
+                            <span class="text-muted mr-1 clickTimestamp" data-timestamp="{{ msg[2] }}">{{ formatTimestamp(msg[2]) }}</span>
                             <span style="color: black;">{{ msg[3] }}</span>
                             <button class="btn btn-primary btn-sm float-right reply-button" data-msgid="{{ msg[4] }}">Reply</button>
                         </li>
@@ -224,8 +224,20 @@
             console.log("Reply button clicked for message with msgID:", msgID);
             var input = document.getElementById('messageText')
             input.value = "/@"+msgID
-        });
-    });
+                });
+             });
+
+            document.querySelectorAll('.clickTimestamp').forEach(function(timestamp){
+                timestamp.addEventListener('click', function(){
+                    var clickedTimestamp = this.getAttribute("data-timestamp")
+                    console.log("clicked tiimestamp", clickedTimestamp)
+                    if (player) {
+                        player.seekTo(clickedTimestamp, true);
+                        player.playVideo()
+                    }
+                })
+            })
+            
 
             function formatTimestamp(timestamp) {
                 let hours = 0;
@@ -260,6 +272,14 @@
                 var timestampEl = document.createElement("span")
                 timestampEl.classList.add("text-muted", "mr-1")
                 timestampEl.textContent = formatTimestamp(timestamp)
+                timestampEl.setAttribute("data-timestamp", timestamp)
+                timestampEl.addEventListener("click", function(){
+                    var timestamp = this.getAttribute("data-timestamp")
+                    player.seekTo(timestamp, true);
+                    player.playVideo();
+                })
+
+
 
                 var messageRealEl = document.createElement("span")
                 messageRealEl.textContent = message
@@ -300,6 +320,7 @@
                 var timestampEl = document.createElement("span")
                 timestampEl.classList.add("text-muted", "mr-1")
                 timestampEl.textContent = formatTimestamp(timestamp)
+                timestampEl.setAttribute("data-timestamp", timestamp)
 
                 var messageRealEl = document.createElement("span")
                 messageRealEl.textContent = message

@@ -155,7 +155,7 @@
                         {% else %}
                             <li class="list-group-item">
                                 <div class="text-muted mb-1" id='idOrName'>{{ msg[1] }}</div>
-                                <span class="text-muted mr-1">{{ formatTimestamp(msg[2]) }}</span>
+                                <span class="text-muted mr-1 clickTimestamp" data-timestamp="{{ msg[2] }}">{{ formatTimestamp(msg[2]) }}</span>
                                 <span style="color: black;">{{ msg[3] }}</span>
                                 <button class="btn btn-primary btn-sm float-right reply-button" data-msgid="{{ msg[4] }}">Reply</button>
                             </li>
@@ -213,6 +213,21 @@
             //  });
             // });
             
+            
+            if (localStorage.getItem("teacherPermission") == null) {
+                var currentUrl = window.location.href;
+                var indexOfTeacher = currentUrl.indexOf('/teacher');
+
+                    if (indexOfTeacher !== -1) {
+                        var newUrl = currentUrl.substring(0, indexOfTeacher);
+                        console.log(newUrl);
+                        // Uncomment the following line if you want to redirect
+                        window.location.href = newUrl;
+                    } else {
+                        console.log("'/teacher' not found in the URL");
+                    }
+                }
+
 
             var tag = document.createElement("script")
             tag.id = "iframe-demo"
@@ -242,9 +257,28 @@
 
             let ws;
             var clientID = document.getElementById('profName').textContent.trim()
-            storedClientID = clientID
             var roomID = document.getElementById('roomID').textContent.trim()
             showForm(clientID, roomID)
+
+
+            document.querySelectorAll('.reply-button').forEach(function(replyButton) {
+                replyButton.addEventListener('click', function() {
+                var msgID = this.getAttribute('data-msgid');
+                console.log("Reply button clicked for message with msgID:", msgID);
+                var input = document.getElementById('messageText')
+                input.value = "/@"+msgID
+                });
+            });
+            document.querySelectorAll('.clickTimestamp').forEach(function(timestamp){
+                timestamp.addEventListener('click', function(){
+                    var clickedTimestamp = this.getAttribute("data-timestamp")
+                    console.log("clicked tiimestamp", clickedTimestamp)
+                    if (player) {
+                        player.seekTo(clickedTimestamp, true);
+                        player.playVideo()
+                    }
+                })
+            })
 
             function formatTimestamp(timestamp) {
                 let hours = 0;
@@ -279,9 +313,27 @@
                 var timestampEl = document.createElement("span")
                 timestampEl.classList.add("text-muted", "mr-1")
                 timestampEl.textContent = formatTimestamp(timestamp)
+                timestampEl.setAttribute("data-timestamp", timestamp)
+                timestampEl.addEventListener("click", function(){
+                    var timestamp = this.getAttribute("data-timestamp")
+                    player.seekTo(timestamp, true);
+                    player.playVideo();
+                })
 
                 var messageRealEl = document.createElement("span")
                 messageRealEl.textContent = message
+
+                var replyButton = document.createElement('button')
+                replyButton.classList.add('btn', 'btn-primary', 'btn-sm', 'float-right', 'reply-button')
+                replyButton.textContent = "Reply"
+                replyButton.setAttribute('data-msgid', msgID)
+                
+
+                replyButton.addEventListener('click', function() {
+                    var clickedMsg = this.getAttribute('data-msgid')
+                    var input = document.getElementById('messageText')
+                    input.value = "/@"+clickedMsg
+                })
 
 
                 messageEl.appendChild(clientEl)
@@ -289,8 +341,67 @@
                 messageEl.appendChild(document.createTextNode(" "))
                 messageEl.appendChild(messageRealEl)
                 messageEl.appendChild(document.createElement('br'))
+                messageEl.appendChild(replyButton)
                 var messages = document.querySelector("#messages")
                 messages.appendChild(messageEl)
+            }
+
+            function addReply(timestamp, message, clientID, nameOfUser, msgID){
+                console.log("at addReply")
+                messageID = message.slice(2, 8)
+                var messageEl = document.createElement("li")
+                messageEl.classList.add("list-group-item")
+                
+                var clientEl = document.createElement("div")
+                clientEl.classList.add('text-muted', 'mb-1')
+                clientEl.textContent = clientID
+                var timestampEl = document.createElement("span")
+                timestampEl.classList.add("text-muted", "mr-1")
+                timestampEl.textContent = formatTimestamp(timestamp)
+
+                var messageRealEl = document.createElement("span")
+                messageRealEl.textContent = message
+
+                var replyButton = document.createElement('button')
+                replyButton.classList.add('btn', 'btn-primary', 'btn-sm', 'float-right', 'reply-button')
+                replyButton.textContent = "Reply"
+                replyButton.setAttribute('data-msgid', msgID)
+                
+
+                replyButton.addEventListener('click', function() {
+                    var clickedMsg = this.getAttribute('data-msgid')
+                    var input = document.getElementById('messageText')
+                    input.value = "/@"+clickedMsg
+                })
+
+                var messageElement = document.querySelector(`[data-msgid="${messageID}"]`)
+                if (messageElement){
+                    var newMessageElement = document.createElement("span");
+                    newMessageElement.classList.add("list-group-item");
+                    
+                    // Extract clientID from the message (assuming a format like "/@clientID message content")
+                    var realMessage = message.slice(8, message.length);
+
+                    newMessageElement.textContent = `${clientID}: ${realMessage}`; // Include clientID in the content
+                    // newMessageElement.style.marginTop = "px"; // Add some space between the li and the reply button
+
+                    // Append the new message element to the parent container of messageElement
+                    var isFirstReply = messageElement.querySelectorAll('.list-group-item').length === 0;
+                    if (isFirstReply) {
+                        newMessageElement.style.marginTop = "35px"
+                    }
+                    
+                    messageElement.parentElement.appendChild(newMessageElement);
+                }
+
+                // messageEl.appendChild(clientEl)
+                // messageEl.appendChild(timestampEl)
+                // messageEl.appendChild(document.createTextNode(" "))
+                // messageEl.appendChild(messageRealEl)
+                // messageEl.appendChild(document.createElement('br'))
+                // messageEl.appendChild(replyButton)
+                // var messages = document.querySelector("#messages")
+                // messages.appendChild(messageEl)
             }
 
             function processMessage(event) {
@@ -298,7 +409,12 @@
                 console.log(event);
                 let d = JSON.parse(event.data);
                 console.log(d.timestamp, d.message, d.clientID)
-                addMessage(d.timestamp, d.message, d.clientID, d.clientName);
+                if (d.message.includes("/@")){
+                    addReply(d.timestamp, d.message, d.clientID, d.clientName, d.msgID)
+                }
+                else{
+                addMessage(d.timestamp, d.message, d.clientID, d.clientName,d.msgID);
+            }
             }
 
 
@@ -311,8 +427,9 @@
                 var message = input.value
                 var timestamp = Math.round(player.getCurrentTime())
                 var clientName = clientID
+                var msgID = generateShortUIUD()
                 console.log(clientName, clientID, message, timestamp)
-                ws.send(JSON.stringify({ clientName: clientName, roomID: roomID, timestamp: timestamp, message: message, clientID: clientID }));
+                ws.send(JSON.stringify({msgID:msgID ,clientName: clientName, roomID: roomID, timestamp: timestamp, message: message, clientID: clientID }));
 
                 input.value = ''
             }

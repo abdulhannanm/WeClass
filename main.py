@@ -11,9 +11,9 @@ import mysql
 import mysql.connector
 import json
 import datetime
+from decouple import config
 
 app = FastAPI()
-
 
 
 app.mount("/static", StaticFiles(directory="static"), name="static")
@@ -21,23 +21,28 @@ app.mount("/static", StaticFiles(directory="static"), name="static")
 templates = Jinja2Templates(directory="templates")
 
 db_config = {
-    "host" : "localhost",
-    "user" : "root",
-    "password": "ffrn1234",
+    "host" : config("DB_HOST"),
+    "user" : config("DB_USER"),
+    "password": config("DB_PASSWORD"),
+    "port":3307,
 }
 
 
+try:
+    connection = mysql.connector.connect(**db_config)
+    cursor = connection.cursor()
 
-connection = mysql.connector.connect(**db_config)
-cursor = connection.cursor()
+    print("connection established")
+except mysql.connector.Error as err:
+    print(f"Error: {err}")
 
 
 
 
 
 def create_db():
-    cursor.execute("CREATE DATABASE IF NOT EXISTS chat_db")
-    cursor.execute("USE chat_db")
+    cursor.execute("CREATE DATABASE IF NOT EXISTS weclass")
+    cursor.execute("USE weclass")
     cursor.execute("""
     CREATE TABLE IF NOT EXISTS vid_ids (
         id INT AUTO_INCREMENT PRIMARY KEY,
