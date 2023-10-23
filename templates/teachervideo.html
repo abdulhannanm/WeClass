@@ -141,14 +141,26 @@
                         </div>
                     </form>
                 </div>
-                    <ul id='messages' class="list-group mt-2" style="border-radius: 20px;">
-                        {% for msg in stored_messages %}
-                        <li class="list-group-item">
-                            <div class="text-muted mb-1" id='idOrName'>{{ msg[1] }}</div>
-                            <span class="text-muted mr-1">{{ formatTimestamp(msg[2]) }}</span>
-                            <span style="color: black;">{{ msg[3] }}</span>
+                <ul id='messages' class="list-group mt-2" style="border-radius: 20px;">
+                    {% for msg in stored_messages %}
+                        {% if '/@' in msg[3] %}
+                            <!-- Nested structure for replies -->
+                            <li class="list-group-item">
+                            <ul class="list-group" style="margin-bottom:5px;">
+                                <li class="list-group-item">
+                                    <span style="color: black;">{{ msg[1] }}: {{ msg[3][8:] }}</span>
+                                </li>
+                            </ul>
                         </li>
-                        {% endfor %}
+                        {% else %}
+                            <li class="list-group-item">
+                                <div class="text-muted mb-1" id='idOrName'>{{ msg[1] }}</div>
+                                <span class="text-muted mr-1">{{ formatTimestamp(msg[2]) }}</span>
+                                <span style="color: black;">{{ msg[3] }}</span>
+                                <button class="btn btn-primary btn-sm float-right reply-button" data-msgid="{{ msg[4] }}">Reply</button>
+                            </li>
+                        {% endif %}
+                    {% endfor %}
                     </ul>
                 </div>
             </div>
@@ -228,10 +240,11 @@
                 return result
             }
 
-
-            var clientID = document.getElementById('profName').textContent.trim()
-            var storedClientID = clientID
             let ws;
+            var clientID = document.getElementById('profName').textContent.trim()
+            storedClientID = clientID
+            var roomID = document.getElementById('roomID').textContent.trim()
+            showForm(clientID, roomID)
 
             function formatTimestamp(timestamp) {
                 let hours = 0;
@@ -248,19 +261,20 @@
                 return `${hours > 0 ? hours.toString() + ":" : ""}${minutes}:${seconds.toString().padStart(2, "0")}`;
             }
 
-            function addMessage(timestamp, message, clientID, nameOfUser) {
+            function addMessage(timestamp, message, clientID, nameOfUser, msgID) {
                 console.log("at addMessage")
                 var messageEl = document.createElement("li")
                 messageEl.classList.add("list-group-item")
                 
                 var clientEl = document.createElement("div")
                 clientEl.classList.add('text-muted', 'mb-1')
-                if (clientID == storedClientID){
-                    clientEl.textContent = "You"
-                }
-                else{
-                    clientEl.textContent = nameOfUser
-                }
+                clientEl.textContent = nameOfUser
+                // if (clientID == localStorage.getItem('clientID')){
+                //     clientEl.textContent = "You"
+                // }
+                // else{
+                //     clientEl.textContent = clientID
+                // }
 
                 var timestampEl = document.createElement("span")
                 timestampEl.classList.add("text-muted", "mr-1")
@@ -269,10 +283,12 @@
                 var messageRealEl = document.createElement("span")
                 messageRealEl.textContent = message
 
+
                 messageEl.appendChild(clientEl)
                 messageEl.appendChild(timestampEl)
                 messageEl.appendChild(document.createTextNode(" "))
                 messageEl.appendChild(messageRealEl)
+                messageEl.appendChild(document.createElement('br'))
                 var messages = document.querySelector("#messages")
                 messages.appendChild(messageEl)
             }
@@ -294,20 +310,19 @@
                 var input = document.getElementById("messageText")
                 var message = input.value
                 var timestamp = Math.round(player.getCurrentTime())
-                var clientName = localStorage.getItem('clientName')
+                var clientName = clientID
                 console.log(clientName, clientID, message, timestamp)
                 ws.send(JSON.stringify({ clientName: clientName, roomID: roomID, timestamp: timestamp, message: message, clientID: clientID }));
 
                 input.value = ''
             }
             
-            function showForm(event, roomID) {
+            function showForm(clientID, roomID) {
                 console.log(roomID)
                 var button = document.getElementById("connect");
                 var form = document.getElementById("form");
                 button.style.display = "none";
                 form.style.display = "block";
-                event.preventDefault()
                 if (ws) {
                     ws.onmessage = processMessage
                 }
