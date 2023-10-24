@@ -7,54 +7,50 @@ import random
 import string
 from fastapi.middleware.cors import CORSMiddleware
 import uvicorn
+import mysql
+import mysql.connector
+import json
+import datetime
+from decouple import config
 
 app = FastAPI()
-
-app.add_middleware(
-    CORSMiddleware,
-    allow_origins=["*"],
-    allow_methods=["*"],
-    allow_headers=["*"],
-)
-
-@app.middleware("http")
-async def add_permissions_policy_header(request: Request, call_next):
-    response: Response = await call_next(request)
-    response.headers["Permissions-Policy"] = "accelerometer=(), camera=(), geolocation=(), gyroscope=(), magnetometer=(), microphone=(), payment=(), usb=()"
-
-    return response
 
 
 app.mount("/static", StaticFiles(directory="static"), name="static")
 
 templates = Jinja2Templates(directory="templates")
 
-# db_config = {
-#     "host" : "localhost",
-#     "user" : "root",
-#     "password": "ffrn1234",
-# }
+db_config = {
+    "host" : config("DB_HOST"),
+    "user" : config("DB_USER"),
+    "password": config("DB_PASSWORD"),
+    "port":3307,
+}
+
+
+try:
+    connection = mysql.connector.connect(**db_config)
+    cursor = connection.cursor()
+
+    print("connection established")
+except mysql.connector.Error as err:
+    print(f"Error: {err}")
 
 
 
-# connection = mysql.connector.connect(**db_config)
-# cursor = connection.cursor()
 
 
+def create_db():
+    cursor.execute("CREATE DATABASE IF NOT EXISTS weclass")
+    cursor.execute("USE weclass")
+    cursor.execute("""
+    CREATE TABLE IF NOT EXISTS vid_ids (
+        id INT AUTO_INCREMENT PRIMARY KEY,
+        room_id TEXT
+    )
+    """)
 
-
-
-# def create_db():
-#     cursor.execute("CREATE DATABASE IF NOT EXISTS chat_db")
-#     cursor.execute("USE chat_db")
-#     cursor.execute("""
-#     CREATE TABLE IF NOT EXISTS vid_ids (
-#         id INT AUTO_INCREMENT PRIMARY KEY,
-#         room_id TEXT
-#     )
-#     """)
-
-# create_db()
+create_db()
 
 
 
@@ -72,70 +68,94 @@ class Room:
     async def broadcast(self, message, sender):
         for client_id, connection in self.connections.items():
             print(message)
+            parsed_data = json.loads(message)
+            roomID = parsed_data.get("roomID")
+            timestamp = parsed_data.get('timestamp')
+            msg = parsed_data.get('message')
+            clientID = parsed_data.get('clientID')
+            clientName = parsed_data.get('clientName')
+            msgID = parsed_data.get("msgID")
+            if '/@' in msg:
+                find_reply(roomID, timestamp, msg, clientID, clientName, msgID)
+            else:
+                add_messages_to_room(roomID, timestamp, msg, clientID, clientName, msgID)
             await connection.send_text(message)
 
 
 room_dict = {}
 
+
+
 def add_room_id():
     nor_res = ''.join(random.choices(string.ascii_lowercase + string.digits, k=5))
     res = str(nor_res)
-    # query1 = "select count(*) from vid_ids where room_id = %s"
-    # values = (res, )
-    # cursor.execute(query1, values)
-    # result = cursor.fetchone()
-    # if result[0] > 0:
-    #     add_room_id()
-    # else:
-    #     query2 = "INSERT INTO vid_ids (room_id) VALUES(%s)"
-    #     values = (res, )
-    #     cursor.execute(query2, values)
-    #     create_table_query = f"""
-    #     CREATE TABLE IF NOT EXISTS {res} (
-    #         id INT AUTO_INCREMENT PRIMARY KEY,
-    #         message TEXT,
-    #         video_timestamp INT,
-    #         timestamp TIMESTAMP DEFAULT CURRENT_TIMESTAMP
-    #     )
-    #     """
-    #     cursor.execute(create_table_query)
-    #     connection.commit()
+    query1 = "select count(*) from vid_ids where room_id = %s"
+    values = (res, )
+    cursor.execute(query1, values)
+    result = cursor.fetchone()
+    if result[0] > 0:
+        add_room_id()
+    else:
+        query2 = "INSERT INTO vid_ids (room_id) VALUES(%s)"
+        values = (res, )
+        cursor.execute(query2, values)
+        create_table_query = f"""
+        CREATE TABLE IF NOT EXISTS {res} (
+            id INT AUTO_INCREMENT PRIMARY KEY,
+            clientid TEXT,
+            msgid TEXT,
+            clientname TEXT,
+            message TEXT,
+            video_timestamp INT,
+            timestamp TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+        )
+        """
+        cursor.execute(create_table_query)
+        connection.commit()
     return res
 
-@app.get("/api/analytics", response_class=JSONResponse)
-async def get_analytics_data():
+def add_messages_to_room(roomID, timestamp, message, clientID, clientName, msgID):
+    print("I AM ALSO BEING CALLED")
+    check_query = f"SELECT COUNT(*) FROM {roomID} WHERE clientid = %s AND clientname = %s AND video_timestamp = %s AND message = %s"
+    cursor.execute(check_query, (clientID, clientName, timestamp, message))
+    result = cursor.fetchone()
 
-    analytics_data = [
-        {
-            "roomID": "room1",
-            "clientID": "Jay Rajesh",
-            "timestamp": "2023-09-22 00:01:40",
-            "message": "2",
-        },
-        {
-            "roomID": "room1",
-            "clientID": "AbdulHannan",
-            "timestamp": "2023-09-22 00:00:20",
-            "message": "2",
-        }
+    if result and result[0] == 0:
+        insert_query = f"INSERT INTO {roomID} (clientid, msgid, clientname, message, video_timestamp) VALUES (%s, %s, %s, %s, %s)"
+        cursor.execute(insert_query, (clientID, msgID, clientName, message, timestamp))    
+        connection.commit()
 
-    ]
+def get_messages_from_room(room_id):
+    query = f'SELECT clientid, clientname, video_timestamp, message, msgid FROM {room_id} ORDER BY timestamp'
+    cursor.execute(query)
+    results = cursor.fetchall()
+    return results
 
-    return JSONResponse(content=analytics_data)    
+def find_reply(roomID, timestamp, message, clientID, clientName, msgID):
+    print('hi')
+    msg_list = message.split()
+    old_msg_id = msg_list[0]
+    msg_id = old_msg_id[2:]
+    check_query = f"SELECT COUNT(*) FROM {roomID} WHERE msgid = %s"
+    cursor.execute(check_query, (msgID, ))
+    record = cursor.fetchone()[0]
+    print(record)
+    if record == 0: 
+        timestamp_query = f'SELECT timestamp FROM {roomID} WHERE msgid = %s'
+        cursor.execute(timestamp_query, (msg_id,))
+        timestamp_of_msg = cursor.fetchone()
+        print(timestamp_of_msg)
+        if timestamp_of_msg:
+            timestamp_of_msg = timestamp_of_msg[0]
+            insert_query = f"INSERT INTO {roomID} (clientid, msgid, clientname, message, video_timestamp, timestamp) VALUES (%s, %s, %s, %s, %s, %s)"
+            cursor.execute(insert_query, (clientID, msgID, clientName, message, timestamp, timestamp_of_msg + datetime.timedelta(seconds=1)))
+            connection.commit()
+            print('Insert successful')
+        else:
+            print("No message with that ID")
+    else:
+        print("record with msgID already exists")
 
-@app.get("/analytics")
-async def get_analytics_page(request:Request):
-    return templates.TemplateResponse("analytics.html", {'request':request})     
-
-
-
-
-
-# def get_messages_for_room(room_id):
-#     query = f'SELECT * FROM {room_id}'
-#     cursor.execute(query)
-#     results = cursor.fetchall()
-#     return results
 
 @app.websocket("/ws/{room_id}/{client_id}")
 async def websocket_endpoint(websocket: WebSocket, client_id: str, room_id: str):
@@ -207,7 +227,7 @@ async def handle_form(video_title: str = Form(...), url: str = Form(...), profna
     print(profname)
     room_id = add_room_id()
     print(room_id)
-    redirectUrl = '/video/'+profname+"/"+video_title+"/"+new_url+'/'+room_id
+    redirectUrl = '/video/'+profname+"/"+video_title+"/"+new_url+'/'+room_id+'/teacher'
     print(redirectUrl)
     return redirectUrl
 
@@ -215,16 +235,59 @@ async def handle_form(video_title: str = Form(...), url: str = Form(...), profna
 @app.get("/video/{profname}/{video_title}/{new_url}/{room_id}", response_class=HTMLResponse)
 async def read_item(request: Request, profname: str, video_title: str, new_url: str, room_id: str):
     video_url = "https://www.youtube.com/embed/" + new_url + "?enablejsapi=1"
-    # messages = get_messages_for_room(room_id)
-    # print(messages)
+    stored_messages = get_messages_from_room(room_id)
+    print(stored_messages)
     messages = '';
+    def format_timestamp(timestamp):
+        hours = 0
+        minutes = 0
+        seconds = timestamp
+        while seconds >= 60:
+            seconds -= 60
+            minutes += 1
+        while minutes >= 60:
+            minutes -= 60
+            hours += 1
+        return f"{minutes:01d}:{seconds:02d}"
+    
     return templates.TemplateResponse("video.html", 
     {"request": request, 
     "video_title": video_title, 
     "profname": profname, 
     "url": video_url, 
     "messages":messages,
-    "room_id": room_id})
+    "room_id": room_id,
+    "stored_messages": stored_messages, 
+    'formatTimestamp': format_timestamp})
+
+
+@app.get("/video/{profname}/{video_title}/{new_url}/{room_id}/teacher", response_class=HTMLResponse)
+async def read_item(request: Request, profname: str, video_title: str, new_url: str, room_id: str):
+    video_url = "https://www.youtube.com/embed/" + new_url + "?enablejsapi=1"
+    stored_messages = get_messages_from_room(room_id)
+    print(stored_messages)
+    messages = '';
+    def format_timestamp(timestamp):
+        hours = 0
+        minutes = 0
+        seconds = timestamp
+        while seconds >= 60:
+            seconds -= 60
+            minutes += 1
+        while minutes >= 60:
+            minutes -= 60
+            hours += 1
+        return f"{minutes:01d}:{seconds:02d}"
+    
+    return templates.TemplateResponse("teachervideo.html", 
+    {"request": request, 
+    "video_title": video_title, 
+    "profname": profname, 
+    "url": video_url, 
+    "messages":messages,
+    "room_id": room_id,
+    "stored_messages": stored_messages, 
+    'formatTimestamp': format_timestamp})
 
 @app.on_event("shutdown")
 async def shutdown_event():

@@ -1,0 +1,145 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="styles.css">
+    <title>Classy Modal</title>
+    <style>
+    button {
+    padding: 10px;
+    margin: 20px;
+    }
+
+/* The Modal (background) */
+    .modal {
+    display: none;
+    position: fixed;
+    z-index: 1;
+    left: 0;
+    top: 0;
+    width: 100%;
+    height: 100%;
+    overflow: auto;
+    background-color: rgba(0,0,0,0.5);
+    }
+
+    /* Modal Content */
+    .modal-content {
+    margin: 15% auto;
+    padding: 20px;
+    border: 5px solid white;
+    width: 50%;
+    text-align:center;
+    background-color: #AE5C9E;
+    border-radius: 10px;
+    color:white;
+    font-family: "Helvetica Neue", Helvetica, Arial, sans-serif;
+    }
+
+    /* Style the buttons */
+    .modal-button {
+      background: white;
+      color: #AE5C9E;
+      padding: 15px 30px; /* Adjust padding to make the buttons larger */
+      margin: 10px; /* Add margin for better spacing */
+      cursor: pointer;
+      font-size: 16px; /* Adjust font size */
+      border: none; 
+      border-radius: 5px;
+    }
+
+/* Hover effect for buttons (optional) */
+  .modal-button:hover {
+    background: #f0f0f0;
+  }
+
+  .modal-content input {
+    padding: 10px;
+    margin: 10px;
+    width: calc(100% - 20px); /* Take up full width with padding and margin */
+    box-sizing: border-box; /* Include padding and border in the element's total width and height */
+    border: none;
+    border-radius: 5px;
+    background-color: white;
+    color: #AE5C9E;
+    font-size: 16px;
+}
+
+  </style>
+</head>
+<body>
+
+
+<div id="myModal" class="modal">
+  <div class="modal-content">
+    <h1 style="text-align:center;">Which Are You</h1>
+    <button class="modal-button" id="teacherBtn">Teacher</button>
+    <button class="modal-button" id='studentBtn'>Student</button>
+  </div>
+</div>
+<div id="secModal" class="modal">
+    <div class="modal-content">
+        <h1 style="text-align:center;">Name</h1>
+        <input type="text" id="nameInput">
+        <button type="submit" id="submitButton" class="modal-button">Submit</button>
+    </div>
+</div>
+
+<script>
+    document.addEventListener('DOMContentLoaded', function () {
+    var modal = document.getElementById('myModal');
+    var closeBtn = document.getElementById('closeModalBtn');
+    var tchBtn = document.getElementById('teacherBtn')
+    var stdBtn = document.getElementById('studentBtn')
+    var secModal = document.getElementById('secModal')
+    var nameInput = document.getElementById('nameInput')
+    var submit = document.getElementById('submitButton')
+
+    // Open the modal when the page loads
+    if (localStorage.getItem('clientRole') === null){
+      modal.style.display = 'block';
+    }
+
+
+    // Close the modal
+    tchBtn.addEventListener('click', function () {
+      localStorage.setItem('clientRole', 'teacher')
+      console.log(localStorage.getItem('clientRole'))
+      modal.style.display = 'none';
+
+      if (localStorage.getItem('clientName') === null ){
+      secModal.style.display = 'block'
+    }
+    })
+    stdBtn.addEventListener('click', function() {
+      localStorage.setItem("clientRole", 'student')
+      console.log(localStorage.getItem('clientRole'))
+      modal.style.display = 'none';
+
+      if (localStorage.getItem('clientName') === null ){
+      secModal.style.display = 'block'
+    }
+    })
+
+    submit.addEventListener('click', function() {
+      var inputValue = nameInput.value
+      localStorage.setItem("clientName", inputValue)
+      console.log(localStorage.getItem('clientName'))
+      secModal.style.display = 'none';
+    })
+    nameInput.addEventListener('keydown', function (event) {
+            if (event.key === 'Enter') {
+                event.preventDefault(); // Prevent the default form submission
+                submitButton.click(); // Trigger the click event on the submit button
+            }
+        });
+  });
+
+
+
+
+</script>
+</body>
+</html>
+

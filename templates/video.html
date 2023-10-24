@@ -4,7 +4,8 @@
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/css/bootstrap.min.css" rel="stylesheet"
         integrity="sha384-GLhlTQ8iRABdZLl6O3oVMWSktQOp6b7In1Zl3/Jr59b6EGGoI1aFkw7cmDA6j6gD" crossorigin="anonymous">
         <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@4.0.0/dist/css/bootstrap.min.css" integrity="sha384-Gn5384xqQ1aoWXA+058RXPxPg6fy4IWvTNh0E263XmFcJlSAwiGgFAW/dAiS6JXm" crossorigin="anonymous">
-		<link rel="icon" href="{{url_for('static', path='images/weclassr.png')}}" type="image/icon type" >
+		<link rel="icon" href="{{url_for('static', path='images/weclass-logo2.png')}}" type="image/icon type" >
+
     <style>
         body{
             background: linear-gradient(90deg, #B84E91, #776bcc);
@@ -14,11 +15,102 @@
         button{
             background-color: #B84E91;
         }
+        .sticky-container {
+            position: sticky;
+            top: 0;
+            background-color: white; /* Optional: Add a background color for better visibility */
+            z-index: 1000; /* Optional: Set a higher z-index to make sure it appears above other elements */
+            border-radius: 10px;
+        }
+
+        /* Style for the form */
+        .sticky-form {
+            display: flex;
+            align-items: center; /* Center the elements vertically */
+            padding-top: 10px;
+        }
+
+        /* Style for form elements */
+        .sticky-form input {
+            flex: 1; /* Take up remaining space in the container */
+            border-radius: 10px;
+            padding: 5px;
+            margin-right: 10px;
+        }
+
+        .sticky-form button {
+            color: #B84E91;
+            background-color: white;
+        }
+
+
+    /* The Modal (background) */
+        .modal {
+        display: none;
+        position: fixed;
+        z-index: 1;
+        left: 0;
+        top: 0;
+        width: 100%;
+        height: 100%;
+        overflow: auto;
+        background-color: rgba(0,0,0,0.5);
+        }
+
+        /* Modal Content */
+        .modal-content {
+        margin: 15% auto;
+        padding: 20px;
+        border: 5px solid white;
+        width: 50%;
+        text-align:center;
+        background-color: #AE5C9E;
+        border-radius: 10px;
+        color:white;
+        font-family: "Helvetica Neue", Helvetica, Arial, sans-serif;
+        }
+
+        /* Style the buttons */
+        .modal-button {
+        background: white;
+        color: #AE5C9E;
+        padding: 15px 30px; /* Adjust padding to make the buttons larger */
+        margin: 10px; /* Add margin for better spacing */
+        cursor: pointer;
+        font-size: 16px; /* Adjust font size */
+        border: none; 
+        border-radius: 5px;
+        }
+
+    /* Hover effect for buttons (optional) */
+    .modal-button:hover {
+        background: #f0f0f0;
+    }
+
+    .modal-content input {
+    padding: 10px;
+    margin: 10px;
+    width: calc(100% - 20px); /* Take up full width with padding and margin */
+    box-sizing: border-box; /* Include padding and border in the element's total width and height */
+    border: none;
+    border-radius: 5px;
+    background-color: white;
+    color: #AE5C9E;
+    font-size: 16px;
+    }   
+
     </style>
-</head>
 <body class="m-0">
         <nav class="navbar navbar-expand-lg navbar-light bg-light" style="background-color:#fff !important; text-decoration: none;">
-                <a class="navbar-brand" href="/" style="color:#B84E91;">WeClass</a>              </nav>
+            <a class="navbar-brand" href="/" style="color:#B84E91;">WeClass</a>
+        </nav>
+        <div id="secModal" class="modal">
+            <div class="modal-content">
+                <h1 style="text-align:center;">Name</h1>
+                <input type="text" id="nameInput">
+                <button type="submit" id="submitButton" class="modal-button">Submit</button>
+            </div>
+        </div>            
         <div class="container mt-5 mb-3">
                 <div class="row">
                     <h1>{{ video_title }}</h1>
@@ -30,53 +122,80 @@
                         <iframe id="video-ifr" src="{{url}}" style="border-radius:25px;">
                         </iframe>
                     </div>
-                    <!-- <button id="closeButton">Click to Close</button> -->
-                    <!-- <h1 id=room-id style="color: white;">{{room_id}}</h1> -->
+                    <div id="roomID" style="display: none;">{{ room_id }}</div>
+
                     <div style="margin-block: 20px; "></div>
-                    <button class="btn btn-primary btn-lg active" onClick="showForm(event, '{{room_id}}')" id="connect" style="background-color: #fff; color: #B84E91; border-radius: 10px;">Connect</button>
-                    <form class="" action="" onsubmit="sendMessage(event)" id="form" style="display: none">
+                <button class="btn btn-primary btn-lg active" onClick="showForm(event, '{{room_id}}')" id="connect" style="background-color: #fff; color: #B84E91; border-radius: 10px;">Connect</button>
+                <div class="sticky-container">
+                    <form class="sticky-form" action="" onsubmit="sendMessage(event)" id="form" style="display: none">
                         <div class="mt-1 column">
                             <input type="text" class="form-control" id="messageText" autocomplete="off" required style="border-radius: 10px;">
-                            <!--
-                            <input type="text" class="form-control" id="timestamp1" autocomplete="off"/>
-                            <input type="text" class="form-control" id="timestamp2" autocomplete="off"/>
-                            -->
                             <button type="submit" class="mt-2 btn btn-primary" style="color:#B84E91; background-color:white;">Send</button>
                         </div>
                     </form>
-                    <ul id='messages' class="list-group mt-2" style="border-radius: 20px;">
-                        <!--
+                </div>
+                <ul id='messages' class="list-group mt-2" style="border-radius: 20px;">
+                {% for msg in stored_messages %}
+                    {% if '/@' in msg[3] %}
+                        <!-- Nested structure for replies -->
                         <li class="list-group-item">
-                            <span class="text-muted mr-1">2:12</span>
-                            <span>My question</span>
-                        </li>
+                        <ul class="list-group" style="margin-bottom:5px;">
+                            <li class="list-group-item">
+                                <span style="color: black;">{{ msg[0] }}: {{ msg[3][8:] }}</span>
+                            </li>
+                        </ul>
+                    </li>
+                    {% else %}
                         <li class="list-group-item">
-                            <span class="text-muted mr-1">2:19</span>
-                            <span>My question</span>
+                            <div class="text-muted mb-1" id='idOrName'>{{ msg[0] }}</div>
+                            <span class="text-muted mr-1 clickTimestamp" data-timestamp="{{ msg[2] }}">{{ formatTimestamp(msg[2]) }}</span>
+                            <span style="color: black;">{{ msg[3] }}</span>
+                            <button class="btn btn-primary btn-sm float-right reply-button" data-msgid="{{ msg[4] }}">Reply</button>
                         </li>
-                    -->
-                    </ul>
+                    {% endif %}
+                {% endfor %}
+                </ul>
                 </div>
             </div>
         <script>
-            // var messagesFromDB = {{ messages|tojson|safe }};
-            // console.log("Messages from database:", messagesFromDatabase);
-            // var closeButton = document.getElementById("closeButton");
-            // closeButton.addEventListener("click", function() {
-            //     ws.send(JSON.stringify({ close: true}));
-            // });
-            // const storedClientId = localStorage.getItem("clientID")
-            // const storedClientId = localStorage.getItem("clientID")
-            // const clientID = storedClientID || Date.now()
-            // localStorage.setItem("clientID", clientID)
-            // const ws = new WebSocket(`ws://localhost:8000/ws/${clientID}`)
+            function generateShortUIUD() {
+                let result = ''
+                const chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789'
+                for (let i = 0; i < 6; i++){
+                    const randomIndex = Math.floor(Math.random() * chars.length);
+                    result += chars.charAt(randomIndex)
+                }
+                return result
+            }
+            document.addEventListener('DOMContentLoaded', function () {
+                var secModal = document.getElementById('secModal')
+                var nameInput = document.getElementById('nameInput')
+                var submit = document.getElementById('submitButton')
+                // // Open the modal when the page loads
+                if (localStorage.getItem('clientName') === null){
+                    console.log('here')
+                    secModal.style.display = 'block';
+                }
+
+                
+                submit.addEventListener('click', function() {
+                var inputValue = nameInput.value
+                localStorage.setItem("clientName", inputValue)
+                localStorage.setItem('clientID', generateShortUIUD())
+                console.log(localStorage.getItem('clientName'))
+                secModal.style.display = 'none';
+                })
+                nameInput.addEventListener('keydown', function (event) {
+                if (event.key === 'Enter') {
+                    event.preventDefault(); // Prevent the default form submission
+                    submitButton.click(); // Trigger the click event on the submit button
+                }
+             });
+            });
+
             
-            // const clientID = storedClientID || Date.now()
-            // localStorage.setItem("clientID", clientID)
-            // const ws = new WebSocket(`ws://localhost:8000/ws/${clientID}`)
-            // window.onload = () => {
-            //     const storedClientId = localStorage.getItem("clientID")
-            // }
+            
+
             var tag = document.createElement("script")
             tag.id = "iframe-demo"
             tag.src = "https://www.youtube.com/iframe_api"
@@ -92,20 +211,31 @@
                 })
             }
 
-            window.onload = function() {
-                const userName = prompt("Name or Press Enter To Stay Anonymous:") || Date.now();
-                localStorage.setItem("name", JSON.stringify(userName))
-                return userName;
-            }
 
-
-        
-            // const userName = promptForName();
-            // console.log(userName)
-
-            var clientID = Date.now()
             let ws;
+            var roomID = document.getElementById('roomID').textContent.trim()
+            showForm(roomID, localStorage.getItem('clientID'))
 
+
+            document.querySelectorAll('.reply-button').forEach(function(replyButton) {
+            replyButton.addEventListener('click', function() {
+            var msgID = this.getAttribute('data-msgid');
+            console.log("Reply button clicked for message with msgID:", msgID);
+            var input = document.getElementById('messageText')
+            input.value = "/@"+msgID
+                });
+             });
+
+            document.querySelectorAll('.clickTimestamp').forEach(function(timestamp){
+                timestamp.addEventListener('click', function(){
+                    var clickedTimestamp = this.getAttribute("data-timestamp")
+                    console.log("clicked tiimestamp", clickedTimestamp)
+                    if (player) {
+                        player.seekTo(clickedTimestamp, true);
+                        player.playVideo()
+                    }
+                })
+            })
             
 
             function formatTimestamp(timestamp) {
@@ -123,7 +253,7 @@
                 return `${hours > 0 ? hours.toString() + ":" : ""}${minutes}:${seconds.toString().padStart(2, "0")}`;
             }
 
-            function addMessage(timestamp, message, clientID, nameOfUser) {
+            function addMessage(timestamp, message, clientID, msgID) {
                 console.log("at addMessage")
                 var messageEl = document.createElement("li")
                 messageEl.classList.add("list-group-item")
@@ -131,54 +261,157 @@
                 var clientEl = document.createElement("div")
                 clientEl.classList.add('text-muted', 'mb-1')
                 clientEl.textContent = clientID
+                // if (clientID == localStorage.getItem('clientID')){
+                //     clientEl.textContent = "You"
+                // }
+                // else{
+                //     clientEl.textContent = clientID
+                // }
 
                 var timestampEl = document.createElement("span")
                 timestampEl.classList.add("text-muted", "mr-1")
                 timestampEl.textContent = formatTimestamp(timestamp)
+                timestampEl.setAttribute("data-timestamp", timestamp)
+                timestampEl.addEventListener("click", function(){
+                    var timestamp = this.getAttribute("data-timestamp")
+                    player.seekTo(timestamp, true);
+                    player.playVideo();
+                })
+
+
 
                 var messageRealEl = document.createElement("span")
                 messageRealEl.textContent = message
+
+                var replyButton = document.createElement('button')
+                replyButton.classList.add('btn', 'btn-primary', 'btn-sm', 'float-right', 'reply-button')
+                replyButton.textContent = "Reply"
+                replyButton.setAttribute('data-msgid', msgID)
+                
+
+                replyButton.addEventListener('click', function() {
+                    var clickedMsg = this.getAttribute('data-msgid')
+                    var input = document.getElementById('messageText')
+                    input.value = "/@"+clickedMsg
+                })
+
 
                 messageEl.appendChild(clientEl)
                 messageEl.appendChild(timestampEl)
                 messageEl.appendChild(document.createTextNode(" "))
                 messageEl.appendChild(messageRealEl)
+                messageEl.appendChild(document.createElement('br'))
+                messageEl.appendChild(replyButton)
                 var messages = document.querySelector("#messages")
                 messages.appendChild(messageEl)
+
+                
+            }
+
+
+            function addReply(timestamp, message, clientID, msgID){
+                console.log("at addReply")
+                messageID = message.slice(2, 8)
+                var messageEl = document.createElement("li")
+                messageEl.classList.add("list-group-item")
+                
+                var clientEl = document.createElement("div")
+                clientEl.classList.add('text-muted', 'mb-1')
+                clientEl.textContent = clientID
+                var timestampEl = document.createElement("span")
+                timestampEl.classList.add("text-muted", "mr-1")
+                timestampEl.textContent = formatTimestamp(timestamp)
+                timestampEl.setAttribute("data-timestamp", timestamp)
+
+                var messageRealEl = document.createElement("span")
+                messageRealEl.textContent = message
+
+                var replyButton = document.createElement('button')
+                replyButton.classList.add('btn', 'btn-primary', 'btn-sm', 'float-right', 'reply-button')
+                replyButton.textContent = "Reply"
+                replyButton.setAttribute('data-msgid', msgID)
+                
+
+                replyButton.addEventListener('click', function() {
+                    var clickedMsg = this.getAttribute('data-msgid')
+                    var input = document.getElementById('messageText')
+                    input.value = "/@"+clickedMsg
+                })
+
+                var messageElement = document.querySelector(`[data-msgid="${messageID}"]`)
+                if (messageElement){
+                    var newMessageElement = document.createElement("span");
+                    newMessageElement.classList.add("list-group-item");
+                    
+                    // Extract clientID from the message (assuming a format like "/@clientID message content")
+                    var realMessage = message.slice(8, message.length);
+
+                    newMessageElement.textContent = `${clientID}: ${realMessage}`; // Include clientID in the content
+                    // newMessageElement.style.marginTop = "px"; // Add some space between the li and the reply button
+
+                    // Append the new message element to the parent container of messageElement
+                    var isFirstReply = messageElement.querySelectorAll('.list-group-item').length === 0;
+                    if (isFirstReply) {
+                        newMessageElement.style.marginTop = "35px"
+                    }
+                    
+                    messageElement.parentElement.appendChild(newMessageElement);
+                }
+
+                // messageEl.appendChild(clientEl)
+                // messageEl.appendChild(timestampEl)
+                // messageEl.appendChild(document.createTextNode(" "))
+                // messageEl.appendChild(messageRealEl)
+                // messageEl.appendChild(document.createElement('br'))
+                // messageEl.appendChild(replyButton)
+                // var messages = document.querySelector("#messages")
+                // messages.appendChild(messageEl)
             }
 
             function processMessage(event) {
-                console.log("got here")
+                console.log("at processMessage")
                 console.log(event);
                 let d = JSON.parse(event.data);
-                console.log(d.timestamp, d.message, d.clientID)
-                addMessage(d.timestamp, d.message, d.clientID);
+                console.log(d.timestamp, d.message, d.clientID, d.msgID)
+                if (d.message.includes("/@")){
+                    addReply(d.timestamp, d.message, d.clientID, d.msgID)
+                }
+                else{
+                addMessage(d.timestamp, d.message, d.clientID, d.msgID);
             }
+            }
+
 
 
             function sendMessage(event) {
                 event.preventDefault()
+                console.log("at sendMessage")
+                var roomID = document.getElementById('roomID').textContent.trim();
+                console.log(roomID)
                 var input = document.getElementById("messageText")
                 var message = input.value
                 var timestamp = Math.round(player.getCurrentTime())
-                //addMessage(timestamp, message)
-                console.log(clientID, message, timestamp)
-                ws.send(JSON.stringify({ timestamp: timestamp, message: message, clientID: clientID }));
+                var clientName = localStorage.getItem('clientName')
+                var clientID = localStorage.getItem('clientID')
+                var msgID = generateShortUIUD()
+                console.log(clientName, clientID, message, timestamp, msgID)
+                ws.send(JSON.stringify({ msgID:msgID, clientName: clientName, roomID: roomID, timestamp: timestamp, message: message, clientID: clientID }));
 
                 input.value = ''
             }
             
-            function showForm(event, roomID) {
+            function showForm(roomID, clientID) {
+                console.log(roomID)
                 var button = document.getElementById("connect");
                 var form = document.getElementById("form");
                 button.style.display = "none";
                 form.style.display = "block";
-                event.preventDefault()
+                // event.preventDefault()
                 if (ws) {
                     ws.onmessage = processMessage
                 }
                 else{
-                    const wsURL = `wss://weclass-8df8aec151be.herokuapp.com/ws/${roomID}/${clientID}`;
+                    const wsURL = `wss://weclass.us/ws/${roomID}/${clientID}`;
                     ws = new WebSocket(wsURL)
 
                     ws.onopen = () => {
@@ -190,7 +423,7 @@
                 }
             }
 
-            const items = [{roomID: roomID, clientID: clientID, timestamp: formatTimestamp(timestamp)}]
+            // const items = [{clientID: clientID, timestamp: formatTimestamp(timestamp)}]
 
         </script>
         <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/js/bootstrap.bundle.min.js"
