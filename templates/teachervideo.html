@@ -450,7 +450,7 @@
                     ws.onopen = () => {
                         ws.onmessage = processMessage;
                     }
-                    ws.onerror = () => {
+                    ws.onerror = (error) => {
                         console.error(error)
                     }
                 }
